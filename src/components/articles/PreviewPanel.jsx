@@ -77,6 +77,46 @@ export default function PreviewPanel({ formData }) {
           </div>
         )}
 
+        {/* Visual Assets */}
+        {formData.visual_assets?.length > 0 && (
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 mb-2 pb-2 border-b-2 border-purple-500">Visual Aids</h2>
+            <div className="space-y-4">
+              {formData.visual_assets.map((asset, index) => (
+                <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                  {asset.type === 'image' && (
+                    <img src={asset.url} alt={asset.caption || 'Visual asset'} className="w-full rounded" />
+                  )}
+                  {asset.type === 'video' && (
+                    <video src={asset.url} controls className="w-full rounded" />
+                  )}
+                  {asset.type === 'youtube' && (
+                    <div className="aspect-video">
+                      <iframe
+                        src={asset.url.replace('watch?v=', 'embed/')}
+                        className="w-full h-full rounded"
+                        allowFullScreen
+                      />
+                    </div>
+                  )}
+                  {asset.type === 'iframe' && (
+                    <div className="aspect-video">
+                      <iframe
+                        src={asset.url}
+                        className="w-full h-full rounded border"
+                        allowFullScreen
+                      />
+                    </div>
+                  )}
+                  {asset.caption && (
+                    <p className="text-sm text-gray-600 mt-2 italic">{asset.caption}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Tags */}
         {formData.tags?.length > 0 && (
           <div className="pt-4 border-t">

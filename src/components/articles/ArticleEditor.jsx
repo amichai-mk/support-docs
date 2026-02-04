@@ -15,6 +15,7 @@ import CauseSection from './CauseSection';
 import ResolutionSection from './ResolutionSection';
 import PreviewPanel from './PreviewPanel';
 import ValidationPanel from './ValidationPanel';
+import VisualAssetsSection from './VisualAssetsSection';
 import { calculateCompleteness } from './validation';
 import debounce from 'lodash/debounce';
 
@@ -41,6 +42,7 @@ export default function ArticleEditor({ articleId }) {
         cause: article.cause || '',
         resolution_steps: article.resolution_steps || [],
         verification: article.verification || '',
+        visual_assets: article.visual_assets || [],
         status: article.status || 'draft',
         product_area: article.product_area || '',
         tags: article.tags || [],
@@ -230,7 +232,12 @@ export default function ArticleEditor({ articleId }) {
                     [...prev.filter(i => !i.field?.includes('resolution')), ...issues]
                   )}
                 />
-              </TabsContent>
+
+                <VisualAssetsSection 
+                  assets={formData.visual_assets || []}
+                  onChange={(assets) => handleFieldChange('visual_assets', assets)}
+                />
+                </TabsContent>
 
               <TabsContent value="preview" className="mt-6">
                 <PreviewPanel formData={formData} />

@@ -6,10 +6,13 @@ import ReactQuill from 'react-quill';
 const modules = {
   toolbar: [
     ['bold', 'italic', 'underline'],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'align': [] }],
+    ['clean']
   ]
 };
 
-const formats = ['bold', 'italic', 'underline'];
+const formats = ['bold', 'italic', 'underline', 'list', 'bullet', 'align'];
 
 // Strip HTML tags for character counting
 const stripHtml = (html) => {
