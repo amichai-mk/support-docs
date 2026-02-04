@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Save, RotateCcw } from 'lucide-react';
+import { Save, RotateCcw, Plus, X } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 const DEFAULT_ENVIRONMENT_TEMPLATE = `Back-Office: Settings > Personnel
@@ -12,20 +13,40 @@ Table: Personnel
 Frequency: Consistent
 Interfaces: Mobile and web`;
 
+const DEFAULT_ID_FORMAT = 'KCS-{MODULE}-{NUMBER}-DB';
+
+const MODULE_OPTIONS = [
+  { value: 'PER', label: 'Personnel' },
+  { value: 'INC', label: 'Incidents' },
+  { value: 'REP', label: 'Reporting' },
+  { value: 'SCH', label: 'Scheduling' },
+  { value: 'INV', label: 'Inventory' },
+  { value: 'TRN', label: 'Training' },
+  { value: 'ADM', label: 'Admin' },
+  { value: 'INT', label: 'Integrations' },
+  { value: 'GEN', label: 'General' },
+];
+
 export default function TemplateConfigTab({ settings, onSave }) {
   const [environmentTemplate, setEnvironmentTemplate] = useState(
     settings?.environment_template || DEFAULT_ENVIRONMENT_TEMPLATE
   );
-  const [articleIdPrefix, setArticleIdPrefix] = useState(
-    settings?.article_id_prefix || 'KCS'
+  const [articleIdFormat, setArticleIdFormat] = useState(
+    settings?.article_id_format || DEFAULT_ID_FORMAT
   );
+  const [moduleOptions, setModuleOptions] = useState(
+    settings?.module_options || MODULE_OPTIONS
+  );
+  const [newModuleCode, setNewModuleCode] = useState('');
+  const [newModuleLabel, setNewModuleLabel] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
     setIsSaving(true);
     await onSave('template_config', {
       environment_template: environmentTemplate,
-      article_id_prefix: articleIdPrefix
+      article_id_format: articleIdFormat,
+      module_options: moduleOptions
     });
     setIsSaving(false);
     toast.success('Template configuration saved');
@@ -33,7 +54,29 @@ export default function TemplateConfigTab({ settings, onSave }) {
 
   const handleReset = () => {
     setEnvironmentTemplate(DEFAULT_ENVIRONMENT_TEMPLATE);
-    setArticleIdPrefix('KCS');
+    setArticleIdFormat(DEFAULT_ID_FORMAT);
+    setModuleOptions(MODULE_OPTIONS);
+  };
+
+  const addModuleOption = () => {
+    if (newModuleCode && newModuleLabel) {
+      setModuleOptions([...moduleOptions, { value: newModuleCode.toUpperCase(), label: newModuleLabel }]);
+      setNewModuleCode('');
+      setNewModuleLabel('');
+    }
+  };
+
+  const removeModuleOption = (index) => {
+    setModuleOptions(moduleOptions.filter((_, i) => i !== index));
+  };
+
+  // Generate preview of the ID format
+  const getFormatPreview = () => {
+    return articleIdFormat
+      .replace('{MODULE}', 'PER')
+      .replace('{NUMBER}', '0001')
+      .replace('{YEAR}', new Date().getFullYear())
+      .replace('{MONTH}', String(new Date().getMonth() + 1).padStart(2, '0'));
   };
 
   return (
@@ -43,19 +86,58 @@ export default function TemplateConfigTab({ settings, onSave }) {
           <CardTitle>Article ID Configuration</CardTitle>
           <CardDescription>Configure how article IDs are generated</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="prefix">Article ID Prefix</Label>
+            <Label htmlFor="format">Article ID Format</Label>
             <Input
-              id="prefix"
-              value={articleIdPrefix}
-              onChange={(e) => setArticleIdPrefix(e.target.value)}
-              placeholder="KCS"
-              className="max-w-xs"
+              id="format"
+              value={articleIdFormat}
+              onChange={(e) => setArticleIdFormat(e.target.value)}
+              placeholder="KCS-{MODULE}-{NUMBER}-DB"
+              className="max-w-md font-mono"
             />
             <p className="text-sm text-gray-500">
-              Example: {articleIdPrefix}-001, {articleIdPrefix}-002
+              Available placeholders: <code className="bg-gray-100 px-1 rounded">{'{MODULE}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{NUMBER}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{YEAR}'}</code>, <code className="bg-gray-100 px-1 rounded">{'{MONTH}'}</code>
             </p>
+            <p className="text-sm text-gray-600">
+              Preview: <span className="font-mono font-semibold">{getFormatPreview()}</span>
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            <Label>Module Identifiers</Label>
+            <div className="flex flex-wrap gap-2">
+              {moduleOptions.map((mod, index) => (
+                <Badge key={index} variant="secondary" className="flex items-center gap-1 py-1 px-2">
+                  <span className="font-mono font-semibold">{mod.value}</span>
+                  <span className="text-gray-500">({mod.label})</span>
+                  <button 
+                    onClick={() => removeModuleOption(index)}
+                    className="ml-1 text-gray-400 hover:text-red-500"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+            <div className="flex gap-2 items-center">
+              <Input
+                value={newModuleCode}
+                onChange={(e) => setNewModuleCode(e.target.value.toUpperCase().slice(0, 4))}
+                placeholder="Code (e.g., PER)"
+                className="w-32 font-mono"
+                maxLength={4}
+              />
+              <Input
+                value={newModuleLabel}
+                onChange={(e) => setNewModuleLabel(e.target.value)}
+                placeholder="Label (e.g., Personnel)"
+                className="w-48"
+              />
+              <Button size="sm" variant="outline" onClick={addModuleOption} disabled={!newModuleCode || !newModuleLabel}>
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
