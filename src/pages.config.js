@@ -51,6 +51,7 @@ import Articles from './pages/Articles';
 import CreateArticle from './pages/CreateArticle';
 import Dashboard from './pages/Dashboard';
 import EditArticle from './pages/EditArticle';
+import Settings from './pages/Settings';
 import __Layout from './Layout.jsx';
 
 
@@ -59,6 +60,7 @@ export const PAGES = {
     "CreateArticle": CreateArticle,
     "Dashboard": Dashboard,
     "EditArticle": EditArticle,
+    "Settings": Settings,
 }
 
 export const pagesConfig = {
