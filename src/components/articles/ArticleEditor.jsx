@@ -38,7 +38,7 @@ export default function ArticleEditor({ articleId }) {
   const [formData, setFormData] = useState({});
   const [validationIssues, setValidationIssues] = useState([]);
 
-  const { data: article, isLoading } = useQuery({
+  const { data: article, isLoading, error } = useQuery({
     queryKey: ['article', articleId],
     queryFn: () => base44.entities.Article.get(articleId),
     enabled: !!articleId,
