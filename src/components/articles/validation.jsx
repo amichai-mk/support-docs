@@ -1,3 +1,11 @@
+// Strip HTML tags for validation
+const stripHtml = (html) => {
+  if (!html) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+};
+
 export const calculateCompleteness = (formData) => {
   let score = 0;
   const weights = {
@@ -13,17 +21,20 @@ export const calculateCompleteness = (formData) => {
     score += weights.title;
   }
 
-  if (formData.issue && formData.issue.trim() !== '') {
+  const issueText = stripHtml(formData.issue);
+  if (issueText.trim() !== '') {
     score += weights.issue;
   }
 
-  if (formData.environment && formData.environment.trim() !== '') {
-    // Check if environment has required labels
+  const envText = stripHtml(formData.environment);
+  if (envText.trim() !== '') {
+    // Check if environment has required labels (in HTML format)
+    const env = formData.environment || '';
     const hasRequiredLabels = 
-      formData.environment.includes('**Back-Office:**') &&
-      formData.environment.includes('**Table:**') &&
-      formData.environment.includes('**Frequency:**') &&
-      formData.environment.includes('**Interfaces:**');
+      env.includes('Back-Office:') &&
+      env.includes('Table:') &&
+      env.includes('Frequency:') &&
+      env.includes('Interfaces:');
     
     if (hasRequiredLabels) {
       score += weights.environment;
@@ -32,7 +43,8 @@ export const calculateCompleteness = (formData) => {
     }
   }
 
-  if (formData.cause && formData.cause.trim() !== '') {
+  const causeText = stripHtml(formData.cause);
+  if (causeText.trim() !== '') {
     score += weights.cause;
   }
 
@@ -59,17 +71,20 @@ export const validateArticle = (formData) => {
   }
 
   // Issue validation
-  if (!formData.issue || formData.issue.trim() === '') {
+  const issueText = stripHtml(formData.issue);
+  if (issueText.trim() === '') {
     issues.push({ field: 'issue', severity: 'error', message: 'Issue section is required' });
   }
 
   // Environment validation
-  if (!formData.environment || formData.environment.trim() === '') {
+  const envText = stripHtml(formData.environment);
+  if (envText.trim() === '') {
     issues.push({ field: 'environment', severity: 'error', message: 'Environment section is required' });
   }
 
   // Cause validation
-  if (!formData.cause || formData.cause.trim() === '') {
+  const causeText = stripHtml(formData.cause);
+  if (causeText.trim() === '') {
     issues.push({ field: 'cause', severity: 'error', message: 'Cause section is required' });
   }
 
