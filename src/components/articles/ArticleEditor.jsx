@@ -34,6 +34,7 @@ export default function ArticleEditor({ articleId }) {
   useEffect(() => {
     if (article) {
       setFormData({
+        article_id: article.article_id || '',
         title: article.title || '',
         issue: article.issue || '',
         environment: article.environment || '',
@@ -111,7 +112,7 @@ export default function ArticleEditor({ articleId }) {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -120,7 +121,7 @@ export default function ArticleEditor({ articleId }) {
   const completeness = calculateCompleteness(formData);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div>
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-6 py-4">
@@ -134,6 +135,11 @@ export default function ArticleEditor({ articleId }) {
                 <ArrowLeft className="w-4 h-4" />
               </Button>
               <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    {article?.article_id || 'Generating...'}
+                  </span>
+                </div>
                 <h1 className="text-xl font-bold text-gray-900">{formData.title || 'Untitled Article'}</h1>
                 <div className="flex items-center gap-3 mt-1">
                   <div className="flex items-center gap-2 text-sm text-gray-600">

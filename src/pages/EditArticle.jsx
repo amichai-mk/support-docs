@@ -7,7 +7,7 @@ export default function EditArticle() {
 
   if (!articleId) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-12">
         <p className="text-gray-500">Article not found</p>
       </div>
     );

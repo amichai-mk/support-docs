@@ -11,7 +11,13 @@ export default function CreateArticle() {
   useEffect(() => {
     // Create initial draft article
     const initializeArticle = async () => {
+      // Get count of existing articles to generate next ID
+      const allArticles = await base44.entities.Article.list();
+      const nextNumber = allArticles.length + 1;
+      const articleId = `KCS-${String(nextNumber).padStart(4, '0')}`;
+      
       const article = await base44.entities.Article.create({
+        article_id: articleId,
         title: 'Untitled Article',
         issue: '',
         status: 'draft',
@@ -26,7 +32,7 @@ export default function CreateArticle() {
 
   if (!articleId) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );

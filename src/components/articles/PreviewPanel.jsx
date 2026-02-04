@@ -15,6 +15,9 @@ export default function PreviewPanel({ formData }) {
       <CardContent className="p-6 space-y-6">
         {/* Title */}
         <div>
+          <div className="text-sm font-mono text-gray-500 mb-2">
+            Article ID: {formData.article_id || 'Pending'}
+          </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{formData.title || 'Untitled Article'}</h1>
           {formData.product_area && (
             <span className="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">

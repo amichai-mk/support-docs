@@ -45,7 +45,7 @@ export default function Articles() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
@@ -123,6 +123,11 @@ export default function Articles() {
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                            {article.article_id}
+                          </span>
+                        </div>
                         <CardTitle className="text-xl mb-2">{article.title}</CardTitle>
                         <p className="text-gray-600 text-sm line-clamp-2">{article.issue}</p>
                       </div>
