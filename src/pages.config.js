@@ -49,16 +49,16 @@
  */
 import Articles from './pages/Articles';
 import CreateArticle from './pages/CreateArticle';
-import EditArticle from './pages/EditArticle';
 import Dashboard from './pages/Dashboard';
+import EditArticle from './pages/EditArticle';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
     "Articles": Articles,
     "CreateArticle": CreateArticle,
-    "EditArticle": EditArticle,
     "Dashboard": Dashboard,
+    "EditArticle": EditArticle,
 }
 
 export const pagesConfig = {
