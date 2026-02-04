@@ -1,13 +1,31 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { AlertCircle } from 'lucide-react';
+import ReactQuill from 'react-quill';
+
+const modules = {
+  toolbar: [
+    ['bold', 'italic', 'underline'],
+  ]
+};
+
+const formats = ['bold', 'italic', 'underline'];
+
+// Strip HTML tags for character counting
+const stripHtml = (html) => {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html || '';
+  return tmp.textContent || tmp.innerText || '';
+};
 
 export default function IssueSection({ value, onChange, onValidation }) {
+  const plainText = stripHtml(value);
+  const charCount = plainText.length;
+
   useEffect(() => {
     const issues = [];
     
-    if (value && value.length > 150) {
+    if (charCount > 150) {
       issues.push({
         field: 'issue',
         severity: 'error',
@@ -15,7 +33,7 @@ export default function IssueSection({ value, onChange, onValidation }) {
       });
     }
     
-    const sentenceCount = (value || '').split(/[.!?]+/).filter(s => s.trim()).length;
+    const sentenceCount = plainText.split(/[.!?]+/).filter(s => s.trim()).length;
     if (sentenceCount > 2) {
       issues.push({
         field: 'issue',
@@ -25,9 +43,7 @@ export default function IssueSection({ value, onChange, onValidation }) {
     }
     
     onValidation(issues);
-  }, [value, onValidation]);
-
-  const charCount = (value || '').length;
+  }, [value, charCount, plainText, onValidation]);
 
   return (
     <Card>
@@ -46,11 +62,14 @@ export default function IssueSection({ value, onChange, onValidation }) {
           <em>Example: "ALS-certified personnel are not appearing in the crew selection dropdown when creating a new incident."</em>
         </div>
         
-        <Textarea
+        <ReactQuill
+          theme="snow"
           value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={onChange}
+          modules={modules}
+          formats={formats}
           placeholder="Describe the issue clearly and concisely..."
-          className="min-h-[100px]"
+          className="bg-white"
         />
         
         {charCount > 150 && (

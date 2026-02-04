@@ -1,74 +1,70 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, Lightbulb } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import ReactMarkdown from 'react-markdown';
+import { Lightbulb } from 'lucide-react';
+import ReactQuill from 'react-quill';
 
-const TEMPLATE = `**Back-Office:** Settings > Personnel  
-**Table:** Personnel  
-**Frequency:** Consistent  
-**Interfaces:** Mobile and web`;
+const TEMPLATE_HTML = `<p><strong>Back-Office:</strong> Settings &gt; Personnel</p>
+<p><strong>Table:</strong> Personnel</p>
+<p><strong>Frequency:</strong> Consistent</p>
+<p><strong>Interfaces:</strong> Mobile and web</p>`;
+
+const modules = {
+  toolbar: [
+    ['bold', 'italic', 'underline'],
+  ]
+};
+
+const formats = ['bold', 'italic', 'underline'];
+
+// Strip HTML tags for validation
+const stripHtml = (html) => {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html || '';
+  return tmp.textContent || tmp.innerText || '';
+};
 
 export default function EnvironmentSection({ value, onChange, onValidation }) {
+  const plainText = stripHtml(value);
+  const charCount = plainText.length;
+
   useEffect(() => {
     const issues = [];
     
     if (value) {
-      if (!value.includes('**Back-Office:**')) {
+      // Check for required labels in HTML content
+      if (!value.includes('<strong>Back-Office:</strong>') && !value.includes('Back-Office:')) {
         issues.push({
           field: 'environment',
           severity: 'error',
-          message: 'Missing **Back-Office:** label'
+          message: 'Missing Back-Office: label'
         });
       }
       
-      if (!value.includes('**Table:**')) {
+      if (!value.includes('<strong>Table:</strong>') && !value.includes('Table:')) {
         issues.push({
           field: 'environment',
           severity: 'error',
-          message: 'Missing **Table:** label'
+          message: 'Missing Table: label'
         });
       }
       
-      if (!value.includes('**Frequency:**')) {
+      if (!value.includes('<strong>Frequency:</strong>') && !value.includes('Frequency:')) {
         issues.push({
           field: 'environment',
           severity: 'error',
-          message: 'Missing **Frequency:** label'
+          message: 'Missing Frequency: label'
         });
       }
       
-      if (!value.includes('**Interfaces:**')) {
+      if (!value.includes('<strong>Interfaces:</strong>') && !value.includes('Interfaces:')) {
         issues.push({
           field: 'environment',
           severity: 'error',
-          message: 'Missing **Interfaces:** label'
+          message: 'Missing Interfaces: label'
         });
       }
       
-      // Check for two-space line breaks
-      const lines = value.split('\n');
-      const hasProperLineBreaks = lines.some(line => line.endsWith('  '));
-      if (!hasProperLineBreaks && lines.length > 1) {
-        issues.push({
-          field: 'environment',
-          severity: 'warning',
-          message: 'Add two spaces at end of lines for proper formatting'
-        });
-      }
-      
-      // Check for wrong navigation
-      if (value.includes('→')) {
-        issues.push({
-          field: 'environment',
-          severity: 'warning',
-          message: 'Use > for navigation (Settings > Table)'
-        });
-      }
-      
-      const charCount = value.length;
       if (charCount < 100) {
         issues.push({
           field: 'environment',
@@ -86,18 +82,20 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
     }
     
     onValidation(issues);
-  }, [value, onValidation]);
+  }, [value, charCount, onValidation]);
 
   const insertTemplate = () => {
-    onChange(TEMPLATE);
+    onChange(TEMPLATE_HTML);
   };
+
+  const hasContent = plainText.trim().length > 0;
 
   return (
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Environment (Conditions & Context)</CardTitle>
-          {!value && (
+          {!hasContent && (
             <Button 
               variant="outline" 
               size="sm"
@@ -111,45 +109,29 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
       <CardContent className="space-y-3">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-900 space-y-2">
           <div>
-            <strong>Format:</strong> Use bold key-value format with line breaks:
+            <strong>Format:</strong> Use bold labels for each field:
           </div>
-          <div className="font-mono text-xs bg-white p-2 rounded border border-blue-300">
-            **Back-Office:** Settings &gt; Personnel<br />
-            **Table:** Personnel<br />
-            **Frequency:** Consistent<br />
-            **Interfaces:** Mobile and web
+          <div className="bg-white p-2 rounded border border-blue-300 text-xs">
+            <p><strong>Back-Office:</strong> Settings &gt; Personnel</p>
+            <p><strong>Table:</strong> Personnel</p>
+            <p><strong>Frequency:</strong> Consistent</p>
+            <p><strong>Interfaces:</strong> Mobile and web</p>
           </div>
           <div className="flex items-start gap-2 text-blue-800">
             <Lightbulb className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            <span>Tip: Add two spaces at end of each line before pressing Enter for line breaks.</span>
+            <span>Tip: Select text and click <strong>B</strong> to make it bold.</span>
           </div>
         </div>
 
-        <Tabs defaultValue="edit" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="edit">Edit</TabsTrigger>
-            <TabsTrigger value="preview">Preview</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="edit" className="mt-3">
-            <Textarea
-              value={value || ''}
-              onChange={(e) => onChange(e.target.value)}
-              placeholder="Insert template or type environment details..."
-              className="min-h-[150px] font-mono text-sm"
-            />
-          </TabsContent>
-          
-          <TabsContent value="preview" className="mt-3">
-            <div className="border rounded-lg p-4 min-h-[150px] bg-gray-50 prose prose-sm max-w-none">
-              {value ? (
-                <ReactMarkdown>{value}</ReactMarkdown>
-              ) : (
-                <p className="text-gray-400">No content to preview</p>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+        <ReactQuill
+          theme="snow"
+          value={value || ''}
+          onChange={onChange}
+          modules={modules}
+          formats={formats}
+          placeholder="Insert template or type environment details..."
+          className="bg-white"
+        />
       </CardContent>
     </Card>
   );

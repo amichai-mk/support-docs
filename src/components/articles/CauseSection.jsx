@@ -1,13 +1,31 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Textarea } from '@/components/ui/textarea';
 import { AlertCircle } from 'lucide-react';
+import ReactQuill from 'react-quill';
+
+const modules = {
+  toolbar: [
+    ['bold', 'italic', 'underline'],
+  ]
+};
+
+const formats = ['bold', 'italic', 'underline'];
+
+// Strip HTML tags for character counting
+const stripHtml = (html) => {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html || '';
+  return tmp.textContent || tmp.innerText || '';
+};
 
 export default function CauseSection({ value, onChange, onValidation }) {
+  const plainText = stripHtml(value);
+  const charCount = plainText.length;
+
   useEffect(() => {
     const issues = [];
     
-    if (value && value.length > 300) {
+    if (charCount > 300) {
       issues.push({
         field: 'cause',
         severity: 'error',
@@ -16,9 +34,7 @@ export default function CauseSection({ value, onChange, onValidation }) {
     }
     
     onValidation(issues);
-  }, [value, onValidation]);
-
-  const charCount = (value || '').length;
+  }, [value, charCount, onValidation]);
 
   return (
     <Card>
@@ -37,11 +53,14 @@ export default function CauseSection({ value, onChange, onValidation }) {
           <em>Example: "The system requires both Certification Level and License Number fields to be populated before personnel appears in crew selection."</em>
         </div>
         
-        <Textarea
+        <ReactQuill
+          theme="snow"
           value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={onChange}
+          modules={modules}
+          formats={formats}
           placeholder="Explain the root cause of the issue..."
-          className="min-h-[100px]"
+          className="bg-white"
         />
         
         {charCount > 300 && (

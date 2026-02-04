@@ -1,6 +1,5 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import ReactMarkdown from 'react-markdown';
 import { FileText } from 'lucide-react';
 
 export default function PreviewPanel({ formData }) {
@@ -30,7 +29,10 @@ export default function PreviewPanel({ formData }) {
         {formData.issue && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2 pb-2 border-b-2 border-red-500">Issue</h2>
-            <p className="text-gray-700">{formData.issue}</p>
+            <div 
+              className="text-gray-700 prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: formData.issue }}
+            />
           </div>
         )}
 
@@ -38,9 +40,10 @@ export default function PreviewPanel({ formData }) {
         {formData.environment && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2 pb-2 border-b-2 border-blue-500">Environment</h2>
-            <div className="prose prose-sm max-w-none">
-              <ReactMarkdown>{formData.environment}</ReactMarkdown>
-            </div>
+            <div 
+              className="prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: formData.environment }}
+            />
           </div>
         )}
 
@@ -48,7 +51,10 @@ export default function PreviewPanel({ formData }) {
         {formData.cause && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2 pb-2 border-b-2 border-yellow-500">Cause</h2>
-            <p className="text-gray-700">{formData.cause}</p>
+            <div 
+              className="text-gray-700 prose prose-sm max-w-none"
+              dangerouslySetInnerHTML={{ __html: formData.cause }}
+            />
           </div>
         )}
 
