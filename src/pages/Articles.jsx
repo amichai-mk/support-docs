@@ -92,11 +92,19 @@ export default function Articles() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Areas</SelectItem>
-                  <SelectItem value="Personnel">Personnel</SelectItem>
+                  <SelectItem value="Dashboard">Dashboard</SelectItem>
+                  <SelectItem value="Hydrants">Hydrants</SelectItem>
+                  <SelectItem value="Properties">Properties</SelectItem>
                   <SelectItem value="Incidents">Incidents</SelectItem>
-                  <SelectItem value="Reporting">Reporting</SelectItem>
-                  <SelectItem value="Settings">Settings</SelectItem>
-                  <SelectItem value="Mobile">Mobile</SelectItem>
+                  <SelectItem value="EPCR">EPCR</SelectItem>
+                  <SelectItem value="Inventory">Inventory</SelectItem>
+                  <SelectItem value="BI">BI</SelectItem>
+                  <SelectItem value="Map View">Map View</SelectItem>
+                  <SelectItem value="Training">Training</SelectItem>
+                  <SelectItem value="Staffworks">Staffworks</SelectItem>
+                  <SelectItem value="MIH">MIH</SelectItem>
+                  <SelectItem value="Management">Management</SelectItem>
+                  <SelectItem value="Department Parameters">Department Parameters</SelectItem>
                 </SelectContent>
               </Select>
             </div>
