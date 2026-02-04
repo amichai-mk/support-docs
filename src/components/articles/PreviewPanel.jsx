@@ -54,10 +54,19 @@ export default function PreviewPanel({ formData }) {
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2 pb-2 border-b-2 border-green-500">Resolution</h2>
             {formData.resolution_steps?.length > 0 && (
-              <ol className="list-decimal list-inside space-y-2 mb-4">
-                {formData.resolution_steps.map((step, index) => (
-                  <li key={index} className="text-gray-700">{step}</li>
-                ))}
+              <ol className="list-decimal list-inside space-y-4 mb-4">
+                {formData.resolution_steps.map((step, index) => {
+                  const stepText = typeof step === 'string' ? step : step?.text || '';
+                  const stepImage = typeof step === 'object' ? step?.image : null;
+                  return (
+                    <li key={index} className="text-gray-700">
+                      {stepText}
+                      {stepImage && (
+                        <img src={stepImage} alt={`Step ${index + 1}`} className="mt-2 ml-4 max-h-48 rounded border" />
+                      )}
+                    </li>
+                  );
+                })}
               </ol>
             )}
             {formData.verification && (
