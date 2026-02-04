@@ -5,8 +5,7 @@ export const calculateCompleteness = (formData) => {
     issue: 20,
     environment: 20,
     cause: 20,
-    resolution_steps: 20,
-    verification: 10
+    resolutions: 30  // Combined steps + verification
   };
 
   if (formData.title && formData.title.trim() !== '' && formData.title !== 'Untitled Article') {
@@ -18,7 +17,6 @@ export const calculateCompleteness = (formData) => {
   }
 
   if (formData.environment && formData.environment.trim() !== '') {
-    // Check if environment has required labels
     const hasRequiredLabels = 
       formData.environment.includes('Back-Office:') &&
       formData.environment.includes('Table:') &&
@@ -28,7 +26,7 @@ export const calculateCompleteness = (formData) => {
     if (hasRequiredLabels) {
       score += weights.environment;
     } else {
-      score += weights.environment * 0.5; // Partial credit
+      score += weights.environment * 0.5;
     }
   }
 
@@ -36,15 +34,31 @@ export const calculateCompleteness = (formData) => {
     score += weights.cause;
   }
 
-  if (formData.resolution_steps && formData.resolution_steps.length > 0) {
-    const hasNonEmptySteps = formData.resolution_steps.some(step => step.trim() !== '');
-    if (hasNonEmptySteps) {
-      score += weights.resolution_steps;
+  // Check resolutions (new format)
+  if (formData.resolutions && formData.resolutions.length > 0) {
+    const hasValidResolution = formData.resolutions.some(res => {
+      const hasSteps = res.steps && res.steps.length > 0 && res.steps.some(step => {
+        const text = typeof step === 'string' ? step : step?.text || '';
+        return text.trim() !== '';
+      });
+      const hasVerification = res.verification && res.verification.trim() !== '';
+      return hasSteps && hasVerification;
+    });
+    
+    if (hasValidResolution) {
+      score += weights.resolutions;
+    } else {
+      // Partial credit if has steps but no verification
+      const hasAnySteps = formData.resolutions.some(res => 
+        res.steps && res.steps.length > 0 && res.steps.some(step => {
+          const text = typeof step === 'string' ? step : step?.text || '';
+          return text.trim() !== '';
+        })
+      );
+      if (hasAnySteps) {
+        score += weights.resolutions * 0.67;
+      }
     }
-  }
-
-  if (formData.verification && formData.verification.trim() !== '') {
-    score += weights.verification;
   }
 
   return Math.round(score);
@@ -73,13 +87,26 @@ export const validateArticle = (formData) => {
     issues.push({ field: 'cause', severity: 'error', message: 'Cause section is required' });
   }
 
-  // Resolution validation
-  if (!formData.resolution_steps || formData.resolution_steps.length === 0) {
-    issues.push({ field: 'resolution', severity: 'error', message: 'At least one resolution step is required' });
-  }
-
-  if (!formData.verification || formData.verification.trim() === '') {
-    issues.push({ field: 'verification', severity: 'error', message: 'Verification statement is required' });
+  // Resolution validation (new format)
+  if (!formData.resolutions || formData.resolutions.length === 0) {
+    issues.push({ field: 'resolution', severity: 'error', message: 'At least one resolution is required' });
+  } else {
+    const hasValidResolution = formData.resolutions.some(res => 
+      res.steps && res.steps.length > 0 && res.steps.some(step => {
+        const text = typeof step === 'string' ? step : step?.text || '';
+        return text.trim() !== '';
+      })
+    );
+    if (!hasValidResolution) {
+      issues.push({ field: 'resolution', severity: 'error', message: 'At least one resolution step is required' });
+    }
+    
+    const allHaveVerification = formData.resolutions.every(res => 
+      res.verification && res.verification.trim() !== ''
+    );
+    if (!allHaveVerification) {
+      issues.push({ field: 'verification', severity: 'error', message: 'All resolutions require verification statements' });
+    }
   }
 
   return issues;

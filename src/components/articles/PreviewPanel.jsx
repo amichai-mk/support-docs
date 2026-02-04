@@ -50,30 +50,42 @@ export default function PreviewPanel({ formData }) {
         )}
 
         {/* Resolution */}
-        {(formData.resolution_steps?.length > 0 || formData.verification) && (
+        {(formData.resolutions?.length > 0 && formData.resolutions.some(r => r.steps?.length > 0)) && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2 pb-2 border-b-2 border-green-500">Resolution</h2>
-            {formData.resolution_steps?.length > 0 && (
-              <ol className="list-decimal list-inside space-y-4 mb-4">
-                {formData.resolution_steps.map((step, index) => {
-                  const stepText = typeof step === 'string' ? step : step?.text || '';
-                  const stepImage = typeof step === 'object' ? step?.image : null;
-                  return (
-                    <li key={index} className="text-gray-700">
-                      {stepText}
-                      {stepImage && (
-                        <img src={stepImage} alt={`Step ${index + 1}`} className="mt-2 ml-4 max-h-48 rounded border" />
-                      )}
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-            {formData.verification && (
-              <p className="text-gray-700 mt-4">
-                <strong>Verification:</strong> {formData.verification}.
-              </p>
-            )}
+            {formData.resolutions.map((resolution, resIndex) => {
+              const hasMultiple = formData.resolutions.length > 1;
+              if (!resolution.steps?.length) return null;
+              
+              return (
+                <div key={resIndex} className={hasMultiple ? 'mb-6' : ''}>
+                  {hasMultiple && (
+                    <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                      {resolution.title || `Option ${resIndex + 1}`}
+                    </h3>
+                  )}
+                  <ol className="list-decimal list-inside space-y-4 mb-4">
+                    {resolution.steps.map((step, stepIndex) => {
+                      const stepText = typeof step === 'string' ? step : step?.text || '';
+                      const stepImage = typeof step === 'object' ? step?.image : null;
+                      return (
+                        <li key={stepIndex} className="text-gray-700">
+                          {stepText}
+                          {stepImage && (
+                            <img src={stepImage} alt={`Step ${stepIndex + 1}`} className="mt-2 ml-4 max-h-48 rounded border" />
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ol>
+                  {resolution.verification && (
+                    <p className="text-gray-700 mt-4">
+                      <strong>Verification:</strong> {resolution.verification}.
+                    </p>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
 
