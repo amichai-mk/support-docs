@@ -37,11 +37,13 @@ export default function Layout({ children }) {
       <header className="bg-white dark:bg-[#1a2a6c] border-b border-gray-200 dark:border-[#0e1b55] sticky top-0 z-50 shadow-sm">
         <div className="flex items-center justify-between px-4 py-3 dark:bg-[#1a2a6c]">
           <div className="w-10" />
-          <img 
-            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/698312b3fe9be2c697c692a1/eeb4e4b9a_ChatGPTImageFeb4202612_27_08PM.png" 
-            alt="EPR FireWorks Support Team"
-            className="h-16 dark:brightness-110 dark:contrast-110"
-          />
+          <Link to={createPageUrl('Dashboard')}>
+            <img 
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/698312b3fe9be2c697c692a1/eeb4e4b9a_ChatGPTImageFeb4202612_27_08PM.png" 
+              alt="EPR FireWorks Support Team"
+              className="h-16 dark:brightness-110 dark:contrast-110 cursor-pointer"
+            />
+          </Link>
           <div className="w-10 flex justify-end">
             {isAdmin && (
               <Link 
