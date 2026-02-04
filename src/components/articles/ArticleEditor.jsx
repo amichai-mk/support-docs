@@ -46,14 +46,26 @@ export default function ArticleEditor({ articleId }) {
 
   useEffect(() => {
     if (article) {
+      // Migrate legacy format to new resolutions format
+      let resolutions = article.resolutions || [];
+      if (resolutions.length === 0 && (article.resolution_steps?.length > 0 || article.verification)) {
+        resolutions = [{
+          title: '',
+          steps: article.resolution_steps || [],
+          verification: article.verification || ''
+        }];
+      }
+      if (resolutions.length === 0) {
+        resolutions = [{ title: '', steps: [], verification: '' }];
+      }
+
       setFormData({
         article_id: article.article_id || '',
         title: article.title || '',
         issue: article.issue || '',
         environment: article.environment || '',
         cause: article.cause || '',
-        resolution_steps: article.resolution_steps || [],
-        verification: article.verification || '',
+        resolutions: resolutions,
         visual_assets: article.visual_assets || [],
         status: article.status || 'draft',
         product_area: article.product_area || '',
@@ -109,8 +121,9 @@ export default function ArticleEditor({ articleId }) {
       return;
     }
 
-    if (formData.resolution_steps.length >= 10) {
-      toast.error('Cannot publish: Too many steps. Please consolidate to 9 or fewer steps.');
+    const hasBlockedResolution = formData.resolutions?.some(res => res.steps?.length >= 10);
+    if (hasBlockedResolution) {
+      toast.error('Cannot publish: One or more resolutions have too many steps. Please consolidate to 9 or fewer steps.');
       return;
     }
 
@@ -234,7 +247,7 @@ export default function ArticleEditor({ articleId }) {
               <Button 
                 onClick={handlePublish}
                 className="bg-green-600 hover:bg-green-700"
-                disabled={completeness < 100 || formData.resolution_steps.length >= 10}
+                disabled={completeness < 100 || formData.resolutions?.some(res => res.steps?.length >= 10)}
               >
                 <CheckCircle className="w-4 h-4 mr-2" />
                 Publish
@@ -289,10 +302,8 @@ export default function ArticleEditor({ articleId }) {
                 />
                 
                 <ResolutionSection 
-                  steps={formData.resolution_steps}
-                  verification={formData.verification}
-                  onStepsChange={(steps) => handleFieldChange('resolution_steps', steps)}
-                  onVerificationChange={(value) => handleFieldChange('verification', value)}
+                  resolutions={formData.resolutions || []}
+                  onResolutionsChange={(resolutions) => handleFieldChange('resolutions', resolutions)}
                   onValidation={(issues) => setValidationIssues(prev => 
                     [...prev.filter(i => !i.field?.includes('resolution')), ...issues]
                   )}
