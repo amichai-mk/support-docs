@@ -71,7 +71,7 @@ export default function ArticlesLibrary({ searchTerm, statusFilter, productAreaF
             to={createPageUrl(`EditArticle?id=${article.id}`)}
             className="block"
           >
-            <Card className="hover:shadow-md transition-all hover:border-blue-300 dark:hover:border-blue-700 cursor-pointer">
+            <Card className="hover:shadow-md transition-all hover:border-[#c41230] dark:hover:border-[#c41230] cursor-pointer border-gray-200 dark:border-[#1a2a6c] dark:bg-[#1a2a6c]">
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
@@ -84,17 +84,17 @@ export default function ArticlesLibrary({ searchTerm, statusFilter, productAreaF
                         {article.status}
                       </Badge>
                     </div>
-                    <h3 className="font-medium text-gray-900 dark:text-white truncate">
+                    <h3 className="font-medium text-[#0e1b55] dark:text-white truncate">
                       {article.title || 'Untitled Article'}
                     </h3>
                     {article.issue && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
+                      <p className="text-sm text-gray-500 dark:text-gray-300 mt-1 line-clamp-1">
                         {article.issue}
                       </p>
                     )}
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-400">
                       {article.product_area && (
-                        <span className="bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded">
+                        <span className="bg-[#0e1b55]/10 dark:bg-[#0e1b55] text-[#0e1b55] dark:text-white px-2 py-0.5 rounded">
                           {article.product_area}
                         </span>
                       )}
@@ -105,8 +105,8 @@ export default function ArticlesLibrary({ searchTerm, statusFilter, productAreaF
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="w-12 h-12 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                      <span className="text-sm font-bold text-gray-600 dark:text-gray-300">
+                    <div className="w-12 h-12 rounded-full bg-[#0e1b55]/10 dark:bg-[#0e1b55] flex items-center justify-center">
+                      <span className="text-sm font-bold text-[#0e1b55] dark:text-white">
                         {article.completeness_score || 0}%
                       </span>
                     </div>

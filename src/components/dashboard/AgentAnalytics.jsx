@@ -48,31 +48,31 @@ export default function AgentAnalytics() {
       title: 'My Articles This Month',
       value: myArticlesThisMonth,
       icon: FileText,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
+      color: 'text-[#0e1b55]',
+      bgColor: 'bg-[#0e1b55]/10',
     },
     {
       title: 'Team Average',
       value: teamAverage,
       icon: Users,
-      color: 'text-green-600',
-      bgColor: 'bg-green-100',
+      color: 'text-[#c41230]',
+      bgColor: 'bg-[#c41230]/10',
     },
     {
       title: 'Ticket Queue',
       value: '—',
       subtitle: 'Integration pending',
       icon: Inbox,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-100',
+      color: 'text-[#0e1b55]',
+      bgColor: 'bg-[#0e1b55]/10',
     },
     {
       title: 'Success Rate',
       value: '—',
       subtitle: 'Integration pending',
       icon: TrendingUp,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
+      color: 'text-[#c41230]',
+      bgColor: 'bg-[#c41230]/10',
     },
   ];
 
@@ -93,7 +93,7 @@ export default function AgentAnalytics() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {metrics.map((metric) => (
-        <Card key={metric.title} className="hover:shadow-md transition-shadow">
+        <Card key={metric.title} className="hover:shadow-md transition-shadow border-gray-200 dark:border-[#1a2a6c] dark:bg-[#1a2a6c]">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>

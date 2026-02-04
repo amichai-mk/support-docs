@@ -9,8 +9,8 @@ export default function IntegrationLinks() {
       name: 'RingCentral',
       description: 'Phone & messaging integration',
       icon: Phone,
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-100 dark:bg-orange-900/30',
+      color: 'text-[#c41230]',
+      bgColor: 'bg-[#c41230]/10 dark:bg-[#c41230]/20',
       status: 'Coming Soon',
       url: '#',
     },
@@ -18,17 +18,17 @@ export default function IntegrationLinks() {
       name: 'HubSpot',
       description: 'CRM & ticketing integration',
       icon: MessageSquare,
-      color: 'text-orange-500',
-      bgColor: 'bg-orange-100 dark:bg-orange-900/30',
+      color: 'text-[#0e1b55] dark:text-white',
+      bgColor: 'bg-[#0e1b55]/10 dark:bg-[#0e1b55]',
       status: 'Coming Soon',
       url: '#',
     },
   ];
 
   return (
-    <Card>
+    <Card className="border-gray-200 dark:border-[#1a2a6c] dark:bg-[#1a2a6c]">
       <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium text-gray-700 dark:text-gray-300">
+        <CardTitle className="text-sm font-medium text-[#0e1b55] dark:text-white">
           Integrations
         </CardTitle>
       </CardHeader>
@@ -36,7 +36,7 @@ export default function IntegrationLinks() {
         {integrations.map((integration) => (
           <div 
             key={integration.name}
-            className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800"
+            className="flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-[#0e1b55]"
           >
             <div className="flex items-center gap-3">
               <div className={`p-2 rounded-lg ${integration.bgColor}`}>
@@ -47,7 +47,7 @@ export default function IntegrationLinks() {
                 <p className="text-xs text-gray-500 dark:text-gray-400">{integration.description}</p>
               </div>
             </div>
-            <span className="text-xs text-gray-400 dark:text-gray-500 bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded">
+            <span className="text-xs text-gray-500 dark:text-gray-300 bg-gray-200 dark:bg-[#1a2a6c] px-2 py-1 rounded">
               {integration.status}
             </span>
           </div>

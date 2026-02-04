@@ -87,7 +87,7 @@ Focus on actionable, solution-oriented articles following KCS methodology.`,
           type="button" 
           onClick={handleAISearch}
           disabled={isAISearching || !query.trim()}
-          className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+          className="bg-[#c41230] hover:bg-[#a30f28] text-white"
         >
           {isAISearching ? (
             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -99,10 +99,10 @@ Focus on actionable, solution-oriented articles following KCS methodology.`,
       </form>
 
       {aiSuggestions && (
-        <Card className="border-purple-200 dark:border-purple-800 bg-purple-50 dark:bg-purple-900/20">
+        <Card className="border-[#c41230]/30 dark:border-[#c41230]/50 bg-[#c41230]/5 dark:bg-[#c41230]/10">
           <CardHeader className="pb-2">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-sm flex items-center gap-2 text-purple-700 dark:text-purple-300">
+              <CardTitle className="text-sm flex items-center gap-2 text-[#c41230] dark:text-[#ff6b7a]">
                 <Sparkles className="w-4 h-4" />
                 AI Article Suggestions
               </CardTitle>
@@ -116,15 +116,15 @@ Focus on actionable, solution-oriented articles following KCS methodology.`,
               {aiSuggestions.map((suggestion, index) => (
                 <div 
                   key={index} 
-                  className="p-3 bg-white dark:bg-gray-800 rounded-lg border border-purple-100 dark:border-purple-800"
+                  className="p-3 bg-white dark:bg-[#1a2a6c] rounded-lg border border-[#0e1b55]/20 dark:border-[#0e1b55]"
                 >
-                  <h4 className="font-medium text-gray-900 dark:text-white">{suggestion.title}</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{suggestion.description}</p>
+                  <h4 className="font-medium text-[#0e1b55] dark:text-white">{suggestion.title}</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{suggestion.description}</p>
                   <div className="flex flex-wrap gap-1 mt-2">
                     {suggestion.keywords?.map((keyword, i) => (
                       <span 
                         key={i}
-                        className="text-xs px-2 py-0.5 bg-purple-100 dark:bg-purple-800 text-purple-700 dark:text-purple-300 rounded"
+                        className="text-xs px-2 py-0.5 bg-[#0e1b55]/10 dark:bg-[#0e1b55] text-[#0e1b55] dark:text-white rounded"
                       >
                         {keyword}
                       </span>

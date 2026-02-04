@@ -41,19 +41,19 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
+    <div className="min-h-screen bg-gray-50 dark:bg-[#0e1b55] transition-colors">
       <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">KCS Dashboard</h1>
-            <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your knowledge articles</p>
+            <h1 className="text-2xl font-bold text-[#0e1b55] dark:text-white">KCS Dashboard</h1>
+            <p className="text-gray-500 dark:text-gray-300 mt-1">Manage your knowledge articles</p>
           </div>
           <div className="flex items-center gap-3">
             <DarkModeToggle isDark={isDarkMode} onToggle={toggleDarkMode} />
             <Button 
               onClick={() => navigate(createPageUrl('CreateArticle'))}
-              className="bg-blue-600 hover:bg-blue-700"
+              className="bg-[#c41230] hover:bg-[#a30f28] text-white"
             >
               <Plus className="w-4 h-4 mr-2" />
               New Article
@@ -63,7 +63,7 @@ export default function Dashboard() {
 
         {/* Analytics */}
         <section className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">Agent Analytics</h2>
+          <h2 className="text-lg font-semibold text-[#0e1b55] dark:text-white mb-4">Agent Analytics</h2>
           <AgentAnalytics />
         </section>
 
@@ -72,7 +72,7 @@ export default function Dashboard() {
           {/* Articles Section */}
           <div className="lg:col-span-3 space-y-4">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">Articles Library</h2>
+              <h2 className="text-lg font-semibold text-[#0e1b55] dark:text-white">Articles Library</h2>
               <ArticleFilters 
                 statusFilter={statusFilter}
                 productAreaFilter={productAreaFilter}

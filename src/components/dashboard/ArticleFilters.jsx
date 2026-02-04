@@ -5,7 +5,7 @@ export default function ArticleFilters({ statusFilter, productAreaFilter, onStat
   return (
     <div className="flex gap-3">
       <Select value={statusFilter} onValueChange={onStatusChange}>
-        <SelectTrigger className="w-[140px] dark:bg-gray-800 dark:border-gray-700">
+        <SelectTrigger className="w-[140px] dark:bg-[#1a2a6c] dark:border-[#0e1b55] dark:text-white">
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
@@ -18,7 +18,7 @@ export default function ArticleFilters({ statusFilter, productAreaFilter, onStat
       </Select>
 
       <Select value={productAreaFilter} onValueChange={onProductAreaChange}>
-        <SelectTrigger className="w-[160px] dark:bg-gray-800 dark:border-gray-700">
+        <SelectTrigger className="w-[160px] dark:bg-[#1a2a6c] dark:border-[#0e1b55] dark:text-white">
           <SelectValue placeholder="Product Area" />
         </SelectTrigger>
         <SelectContent>
