@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertCircle } from 'lucide-react';
+import TextEditorToolbar from './TextEditorToolbar';
 
 export default function CauseSection({ value, onChange, onValidation }) {
+  const textareaRef = useRef(null);
+
   useEffect(() => {
     const issues = [];
     
@@ -37,12 +40,16 @@ export default function CauseSection({ value, onChange, onValidation }) {
           <em>Example: "The system requires both Certification Level and License Number fields to be populated before personnel appears in crew selection."</em>
         </div>
         
-        <Textarea
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Explain the root cause of the issue..."
-          className="min-h-[100px]"
-        />
+        <div>
+          <TextEditorToolbar textareaRef={textareaRef} value={value || ''} onChange={onChange} />
+          <Textarea
+            ref={textareaRef}
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Explain the root cause of the issue..."
+            className="min-h-[100px] rounded-t-none"
+          />
+        </div>
         
         {charCount > 300 && (
           <div className="flex items-start gap-2 text-red-600 text-sm">

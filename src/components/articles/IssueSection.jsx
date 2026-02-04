@@ -1,9 +1,12 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { AlertCircle } from 'lucide-react';
+import TextEditorToolbar from './TextEditorToolbar';
 
 export default function IssueSection({ value, onChange, onValidation }) {
+  const textareaRef = useRef(null);
+
   useEffect(() => {
     const issues = [];
     
@@ -46,12 +49,16 @@ export default function IssueSection({ value, onChange, onValidation }) {
           <em>Example: "ALS-certified personnel are not appearing in the crew selection dropdown when creating a new incident."</em>
         </div>
         
-        <Textarea
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Describe the issue clearly and concisely..."
-          className="min-h-[100px]"
-        />
+        <div>
+          <TextEditorToolbar textareaRef={textareaRef} value={value || ''} onChange={onChange} />
+          <Textarea
+            ref={textareaRef}
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Describe the issue clearly and concisely..."
+            className="min-h-[100px] rounded-t-none"
+          />
+        </div>
         
         {charCount > 150 && (
           <div className="flex items-start gap-2 text-red-600 text-sm">

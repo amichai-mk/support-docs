@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Lightbulb } from 'lucide-react';
+import TextEditorToolbar from './TextEditorToolbar';
 
 const TEMPLATE = `Back-Office: Settings > Personnel
 Table: Personnel
@@ -10,6 +11,8 @@ Frequency: Consistent
 Interfaces: Mobile and web`;
 
 export default function EnvironmentSection({ value, onChange, onValidation }) {
+  const textareaRef = useRef(null);
+
   useEffect(() => {
     const issues = [];
     
@@ -75,15 +78,13 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Environment (Conditions & Context)</CardTitle>
-          {!value && (
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={insertTemplate}
-            >
-              Insert Template
-            </Button>
-          )}
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={insertTemplate}
+          >
+            Insert Template
+          </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
@@ -103,12 +104,16 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
           </div>
         </div>
 
-        <Textarea
-          value={value || ''}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder="Insert template or type environment details..."
-          className="min-h-[150px] font-mono text-sm"
-        />
+        <div>
+          <TextEditorToolbar textareaRef={textareaRef} value={value || ''} onChange={onChange} />
+          <Textarea
+            ref={textareaRef}
+            value={value || ''}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="Insert template or type environment details..."
+            className="min-h-[150px] font-mono text-sm rounded-t-none"
+          />
+        </div>
       </CardContent>
     </Card>
   );
