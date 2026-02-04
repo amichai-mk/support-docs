@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
-export default function ResolutionSection({ steps, verification, onStepsChange, onVerificationChange, onValidation }) {
+export default function ResolutionSection({ steps = [], verification, onStepsChange, onVerificationChange, onValidation }) {
   const [showConsolidationHelper, setShowConsolidationHelper] = useState(false);
 
   useEffect(() => {
