@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, Plus, GripVertical, Trash2, AlertCircle, Lightbulb } from 'lucide-react';
+import { AlertTriangle, Plus, GripVertical, Trash2, Lightbulb, Image, X, Upload } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -12,9 +12,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { base44 } from '@/api/base44Client';
+import { toast } from 'sonner';
 
 export default function ResolutionSection({ steps = [], verification, onStepsChange, onVerificationChange, onValidation }) {
   const [showConsolidationHelper, setShowConsolidationHelper] = useState(false);
+  const [uploading, setUploading] = useState(null); // index of step being uploaded
 
   useEffect(() => {
     const issues = [];
@@ -59,18 +62,68 @@ export default function ResolutionSection({ steps = [], verification, onStepsCha
   }, [steps, verification, onValidation]);
 
   const handleAddStep = () => {
-    onStepsChange([...steps, '']);
+    onStepsChange([...steps, { text: '', image: null }]);
   };
 
   const handleUpdateStep = (index, value) => {
     const newSteps = [...steps];
-    newSteps[index] = value;
+    // Handle both old format (string) and new format (object)
+    if (typeof newSteps[index] === 'string') {
+      newSteps[index] = { text: value, image: null };
+    } else {
+      newSteps[index] = { ...newSteps[index], text: value };
+    }
     onStepsChange(newSteps);
   };
 
   const handleRemoveStep = (index) => {
     const newSteps = steps.filter((_, i) => i !== index);
     onStepsChange(newSteps);
+  };
+
+  const handleImageUpload = async (index, file) => {
+    if (!file) return;
+    
+    setUploading(index);
+    try {
+      const { file_url } = await base44.integrations.Core.UploadFile({ file });
+      const newSteps = [...steps];
+      if (typeof newSteps[index] === 'string') {
+        newSteps[index] = { text: newSteps[index], image: file_url };
+      } else {
+        newSteps[index] = { ...newSteps[index], image: file_url };
+      }
+      onStepsChange(newSteps);
+      toast.success('Screenshot uploaded');
+    } catch (error) {
+      toast.error('Upload failed');
+    } finally {
+      setUploading(null);
+    }
+  };
+
+  const handleRemoveImage = (index) => {
+    const newSteps = [...steps];
+    if (typeof newSteps[index] === 'object') {
+      newSteps[index] = { ...newSteps[index], image: null };
+      onStepsChange(newSteps);
+    }
+  };
+
+  const handlePaste = async (index, e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        const file = item.getAsFile();
+        if (file) {
+          await handleImageUpload(index, file);
+        }
+        break;
+      }
+    }
   };
 
   const handleDragEnd = (result) => {
@@ -83,8 +136,11 @@ export default function ResolutionSection({ steps = [], verification, onStepsCha
     onStepsChange(newSteps);
   };
 
+  // Helper to get step text (handles both string and object formats)
+  const getStepText = (step) => typeof step === 'string' ? step : step?.text || '';
+  const getStepImage = (step) => typeof step === 'object' ? step?.image : null;
+
   const stepCount = steps.length;
-  const warningLevel = stepCount >= 10 ? 'critical' : stepCount >= 9 ? 'high' : stepCount >= 7 ? 'medium' : 'none';
 
   return (
     <>
@@ -149,39 +205,81 @@ export default function ResolutionSection({ steps = [], verification, onStepsCha
             <strong>Guidance:</strong> Each step should be a single, clear action. Maximum 7 steps recommended.
             <br />
             <em>Example: "Navigate to Settings &gt; Personnel" or "Click Save"</em>
+            <br />
+            <span className="text-blue-700">💡 Tip: Paste screenshots from clipboard (Ctrl+V) or upload images for each step.</span>
           </div>
 
           {/* Steps List */}
           <DragDropContext onDragEnd={handleDragEnd}>
             <Droppable droppableId="steps">
               {(provided) => (
-                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-2">
+                <div {...provided.droppableProps} ref={provided.innerRef} className="space-y-3">
                   {steps.map((step, index) => (
                     <Draggable key={index} draggableId={`step-${index}`} index={index}>
                       {(provided) => (
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
-                          className="flex items-center gap-2"
+                          className="border rounded-lg p-3 bg-white"
                         >
-                          <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
-                            <GripVertical className="w-5 h-5 text-gray-400" />
+                          <div className="flex items-center gap-2">
+                            <div {...provided.dragHandleProps} className="cursor-grab active:cursor-grabbing">
+                              <GripVertical className="w-5 h-5 text-gray-400" />
+                            </div>
+                            <span className="text-sm font-medium text-gray-600 w-6">{index + 1}.</span>
+                            <Input
+                              value={getStepText(step)}
+                              onChange={(e) => handleUpdateStep(index, e.target.value)}
+                              onPaste={(e) => handlePaste(index, e)}
+                              placeholder={`Step ${index + 1} (paste screenshot with Ctrl+V)`}
+                              className="flex-1"
+                            />
+                            <input
+                              type="file"
+                              id={`step-image-${index}`}
+                              accept="image/*"
+                              onChange={(e) => handleImageUpload(index, e.target.files[0])}
+                              className="hidden"
+                            />
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => document.getElementById(`step-image-${index}`).click()}
+                              disabled={uploading === index}
+                              title="Add screenshot"
+                            >
+                              {uploading === index ? (
+                                <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <Image className="w-4 h-4 text-gray-500" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleRemoveStep(index)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
                           </div>
-                          <span className="text-sm font-medium text-gray-600 w-6">{index + 1}.</span>
-                          <Input
-                            value={step}
-                            onChange={(e) => handleUpdateStep(index, e.target.value)}
-                            placeholder={`Step ${index + 1}`}
-                            className="flex-1"
-                          />
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => handleRemoveStep(index)}
-                            className="text-red-500 hover:text-red-700"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
+                          
+                          {/* Step Image Preview */}
+                          {getStepImage(step) && (
+                            <div className="mt-2 ml-12 relative inline-block">
+                              <img 
+                                src={getStepImage(step)} 
+                                alt={`Step ${index + 1} screenshot`}
+                                className="max-h-32 rounded border"
+                              />
+                              <button
+                                onClick={() => handleRemoveImage(index)}
+                                className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </Draggable>
