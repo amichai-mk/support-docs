@@ -6,7 +6,18 @@ import { createPageUrl } from '../../utils';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, Eye, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Save, Eye, CheckCircle, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import AIAssistant from './AIAssistant';
 import { toast } from 'sonner';
 import MetadataSection from './MetadataSection';
@@ -113,6 +124,19 @@ export default function ArticleEditor({ articleId }) {
     navigate(createPageUrl('Articles'));
   };
 
+  const deleteMutation = useMutation({
+    mutationFn: () => base44.entities.Article.delete(articleId),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['articles']);
+      toast.success('Article discarded');
+      navigate(createPageUrl('Articles'));
+    },
+  });
+
+  const handleDiscard = () => {
+    deleteMutation.mutate();
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -167,6 +191,31 @@ export default function ArticleEditor({ articleId }) {
                                   formData={formData}
                                   onApplySuggestion={handleFieldChange}
                                 />
+                                <AlertDialog>
+                                  <AlertDialogTrigger asChild>
+                                    <Button variant="outline" className="text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700">
+                                      <Trash2 className="w-4 h-4 mr-2" />
+                                      Discard
+                                    </Button>
+                                  </AlertDialogTrigger>
+                                  <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                      <AlertDialogTitle>Discard Article?</AlertDialogTitle>
+                                      <AlertDialogDescription>
+                                        This will permanently delete this article. This action cannot be undone.
+                                      </AlertDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                      <AlertDialogAction 
+                                        onClick={handleDiscard}
+                                        className="bg-red-600 hover:bg-red-700"
+                                      >
+                                        Discard
+                                      </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                  </AlertDialogContent>
+                                </AlertDialog>
                                 <Button variant="outline" onClick={handleSave}>
                                   <Save className="w-4 h-4 mr-2" />
                                   Save Draft
