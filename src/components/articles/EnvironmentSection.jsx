@@ -1,42 +1,20 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Lightbulb } from 'lucide-react';
-import ReactQuill from 'react-quill';
 
-const TEMPLATE_HTML = `<p><strong>Back-Office:</strong> Settings &gt; Personnel</p>
-<p><strong>Table:</strong> Personnel</p>
-<p><strong>Frequency:</strong> Consistent</p>
-<p><strong>Interfaces:</strong> Mobile and web</p>`;
-
-const modules = {
-  toolbar: [
-    ['bold', 'italic', 'underline'],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    [{ 'align': [] }],
-    ['clean']
-  ]
-};
-
-const formats = ['bold', 'italic', 'underline', 'list', 'bullet', 'align'];
-
-// Strip HTML tags for validation
-const stripHtml = (html) => {
-  const tmp = document.createElement('div');
-  tmp.innerHTML = html || '';
-  return tmp.textContent || tmp.innerText || '';
-};
+const TEMPLATE = `Back-Office: Settings > Personnel
+Table: Personnel
+Frequency: Consistent
+Interfaces: Mobile and web`;
 
 export default function EnvironmentSection({ value, onChange, onValidation }) {
-  const plainText = stripHtml(value);
-  const charCount = plainText.length;
-
   useEffect(() => {
     const issues = [];
     
     if (value) {
-      // Check for required labels in HTML content
-      if (!value.includes('<strong>Back-Office:</strong>') && !value.includes('Back-Office:')) {
+      if (!value.includes('Back-Office:')) {
         issues.push({
           field: 'environment',
           severity: 'error',
@@ -44,7 +22,7 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
         });
       }
       
-      if (!value.includes('<strong>Table:</strong>') && !value.includes('Table:')) {
+      if (!value.includes('Table:')) {
         issues.push({
           field: 'environment',
           severity: 'error',
@@ -52,7 +30,7 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
         });
       }
       
-      if (!value.includes('<strong>Frequency:</strong>') && !value.includes('Frequency:')) {
+      if (!value.includes('Frequency:')) {
         issues.push({
           field: 'environment',
           severity: 'error',
@@ -60,7 +38,7 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
         });
       }
       
-      if (!value.includes('<strong>Interfaces:</strong>') && !value.includes('Interfaces:')) {
+      if (!value.includes('Interfaces:')) {
         issues.push({
           field: 'environment',
           severity: 'error',
@@ -68,6 +46,7 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
         });
       }
       
+      const charCount = value.length;
       if (charCount < 100) {
         issues.push({
           field: 'environment',
@@ -85,20 +64,18 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
     }
     
     onValidation(issues);
-  }, [value, charCount, onValidation]);
+  }, [value, onValidation]);
 
   const insertTemplate = () => {
-    onChange(TEMPLATE_HTML);
+    onChange(TEMPLATE);
   };
-
-  const hasContent = plainText.trim().length > 0;
 
   return (
     <Card>
       <CardHeader>
         <div className="flex justify-between items-center">
           <CardTitle>Environment (Conditions & Context)</CardTitle>
-          {!hasContent && (
+          {!value && (
             <Button 
               variant="outline" 
               size="sm"
@@ -112,28 +89,25 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
       <CardContent className="space-y-3">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-900 space-y-2">
           <div>
-            <strong>Format:</strong> Use bold labels for each field:
+            <strong>Format:</strong> Use labels for each field:
           </div>
-          <div className="bg-white p-2 rounded border border-blue-300 text-xs">
-            <p><strong>Back-Office:</strong> Settings &gt; Personnel</p>
-            <p><strong>Table:</strong> Personnel</p>
-            <p><strong>Frequency:</strong> Consistent</p>
-            <p><strong>Interfaces:</strong> Mobile and web</p>
+          <div className="bg-white p-2 rounded border border-blue-300 text-xs font-mono">
+            Back-Office: Settings &gt; Personnel<br />
+            Table: Personnel<br />
+            Frequency: Consistent<br />
+            Interfaces: Mobile and web
           </div>
           <div className="flex items-start gap-2 text-blue-800">
             <Lightbulb className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            <span>Tip: Select text and click <strong>B</strong> to make it bold.</span>
+            <span>Tip: Click "Insert Template" to get started quickly.</span>
           </div>
         </div>
 
-        <ReactQuill
-          theme="snow"
+        <Textarea
           value={value || ''}
-          onChange={onChange}
-          modules={modules}
-          formats={formats}
+          onChange={(e) => onChange(e.target.value)}
           placeholder="Insert template or type environment details..."
-          className="bg-white"
+          className="min-h-[150px] font-mono text-sm"
         />
       </CardContent>
     </Card>

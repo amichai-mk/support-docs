@@ -1,34 +1,13 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import { AlertCircle } from 'lucide-react';
-import ReactQuill from 'react-quill';
-
-const modules = {
-  toolbar: [
-    ['bold', 'italic', 'underline'],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    [{ 'align': [] }],
-    ['clean']
-  ]
-};
-
-const formats = ['bold', 'italic', 'underline', 'list', 'bullet', 'align'];
-
-// Strip HTML tags for character counting
-const stripHtml = (html) => {
-  const tmp = document.createElement('div');
-  tmp.innerHTML = html || '';
-  return tmp.textContent || tmp.innerText || '';
-};
 
 export default function IssueSection({ value, onChange, onValidation }) {
-  const plainText = stripHtml(value);
-  const charCount = plainText.length;
-
   useEffect(() => {
     const issues = [];
     
-    if (charCount > 150) {
+    if (value && value.length > 150) {
       issues.push({
         field: 'issue',
         severity: 'error',
@@ -36,7 +15,7 @@ export default function IssueSection({ value, onChange, onValidation }) {
       });
     }
     
-    const sentenceCount = plainText.split(/[.!?]+/).filter(s => s.trim()).length;
+    const sentenceCount = (value || '').split(/[.!?]+/).filter(s => s.trim()).length;
     if (sentenceCount > 2) {
       issues.push({
         field: 'issue',
@@ -46,7 +25,9 @@ export default function IssueSection({ value, onChange, onValidation }) {
     }
     
     onValidation(issues);
-  }, [value, charCount, plainText, onValidation]);
+  }, [value, onValidation]);
+
+  const charCount = (value || '').length;
 
   return (
     <Card>
@@ -65,14 +46,11 @@ export default function IssueSection({ value, onChange, onValidation }) {
           <em>Example: "ALS-certified personnel are not appearing in the crew selection dropdown when creating a new incident."</em>
         </div>
         
-        <ReactQuill
-          theme="snow"
+        <Textarea
           value={value || ''}
-          onChange={onChange}
-          modules={modules}
-          formats={formats}
+          onChange={(e) => onChange(e.target.value)}
           placeholder="Describe the issue clearly and concisely..."
-          className="bg-white"
+          className="min-h-[100px]"
         />
         
         {charCount > 150 && (

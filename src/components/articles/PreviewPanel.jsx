@@ -29,10 +29,7 @@ export default function PreviewPanel({ formData }) {
         {formData.issue && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2 pb-2 border-b-2 border-red-500">Issue</h2>
-            <div 
-              className="text-gray-700 prose prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: formData.issue }}
-            />
+            <p className="text-gray-700">{formData.issue}</p>
           </div>
         )}
 
@@ -40,10 +37,7 @@ export default function PreviewPanel({ formData }) {
         {formData.environment && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2 pb-2 border-b-2 border-blue-500">Environment</h2>
-            <div 
-              className="prose prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: formData.environment }}
-            />
+            <pre className="text-gray-700 whitespace-pre-wrap font-sans">{formData.environment}</pre>
           </div>
         )}
 
@@ -51,10 +45,7 @@ export default function PreviewPanel({ formData }) {
         {formData.cause && (
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-2 pb-2 border-b-2 border-yellow-500">Cause</h2>
-            <div 
-              className="text-gray-700 prose prose-sm max-w-none"
-              dangerouslySetInnerHTML={{ __html: formData.cause }}
-            />
+            <p className="text-gray-700">{formData.cause}</p>
           </div>
         )}
 

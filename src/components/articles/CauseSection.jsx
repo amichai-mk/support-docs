@@ -1,34 +1,13 @@
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Textarea } from '@/components/ui/textarea';
 import { AlertCircle } from 'lucide-react';
-import ReactQuill from 'react-quill';
-
-const modules = {
-  toolbar: [
-    ['bold', 'italic', 'underline'],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    [{ 'align': [] }],
-    ['clean']
-  ]
-};
-
-const formats = ['bold', 'italic', 'underline', 'list', 'bullet', 'align'];
-
-// Strip HTML tags for character counting
-const stripHtml = (html) => {
-  const tmp = document.createElement('div');
-  tmp.innerHTML = html || '';
-  return tmp.textContent || tmp.innerText || '';
-};
 
 export default function CauseSection({ value, onChange, onValidation }) {
-  const plainText = stripHtml(value);
-  const charCount = plainText.length;
-
   useEffect(() => {
     const issues = [];
     
-    if (charCount > 300) {
+    if (value && value.length > 300) {
       issues.push({
         field: 'cause',
         severity: 'error',
@@ -37,7 +16,9 @@ export default function CauseSection({ value, onChange, onValidation }) {
     }
     
     onValidation(issues);
-  }, [value, charCount, onValidation]);
+  }, [value, onValidation]);
+
+  const charCount = (value || '').length;
 
   return (
     <Card>
@@ -56,14 +37,11 @@ export default function CauseSection({ value, onChange, onValidation }) {
           <em>Example: "The system requires both Certification Level and License Number fields to be populated before personnel appears in crew selection."</em>
         </div>
         
-        <ReactQuill
-          theme="snow"
+        <Textarea
           value={value || ''}
-          onChange={onChange}
-          modules={modules}
-          formats={formats}
+          onChange={(e) => onChange(e.target.value)}
           placeholder="Explain the root cause of the issue..."
-          className="bg-white"
+          className="min-h-[100px]"
         />
         
         {charCount > 300 && (
