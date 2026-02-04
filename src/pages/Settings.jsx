@@ -27,10 +27,10 @@ export default function Settings() {
         const user = await base44.auth.me();
         setCurrentUser(user);
         if (user?.role !== 'admin') {
-          navigate(createPageUrl('Articles'));
+          navigate(createPageUrl('Dashboard'));
         }
       } catch (error) {
-        navigate(createPageUrl('Articles'));
+        navigate(createPageUrl('Dashboard'));
       }
       setIsCheckingAuth(false);
     };
@@ -87,7 +87,7 @@ export default function Settings() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => navigate(createPageUrl('Articles'))}
+              onClick={() => navigate(createPageUrl('Dashboard'))}
             >
               <ArrowLeft className="w-4 h-4" />
             </Button>
