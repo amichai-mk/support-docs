@@ -12,6 +12,8 @@ Interfaces: Mobile and web`;
 
 export default function EnvironmentSection({ value, onChange, onValidation }) {
   const textareaRef = useRef(null);
+  const onValidationRef = useRef(onValidation);
+  onValidationRef.current = onValidation;
 
   useEffect(() => {
     const issues = [];
@@ -66,8 +68,8 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
       }
     }
     
-    onValidation(issues);
-  }, [value, onValidation]);
+    onValidationRef.current(issues);
+  }, [value]);
 
   const insertTemplate = () => {
     onChange(TEMPLATE);

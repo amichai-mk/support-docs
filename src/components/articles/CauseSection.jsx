@@ -6,6 +6,8 @@ import TextEditorToolbar from './TextEditorToolbar';
 
 export default function CauseSection({ value, onChange, onValidation }) {
   const textareaRef = useRef(null);
+  const onValidationRef = useRef(onValidation);
+  onValidationRef.current = onValidation;
 
   useEffect(() => {
     const issues = [];
@@ -18,8 +20,8 @@ export default function CauseSection({ value, onChange, onValidation }) {
       });
     }
     
-    onValidation(issues);
-  }, [value, onValidation]);
+    onValidationRef.current(issues);
+  }, [value]);
 
   const charCount = (value || '').length;
 
