@@ -9,7 +9,7 @@ export default function Layout({ children }) {
           <img 
                             src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/698312b3fe9be2c697c692a1/5ae7cc8f8_ChatGPTImageFeb4202612_27_08PM.png" 
                             alt="EPR FireWorks Support Team"
-                            className="h-14"
+                            className="h-24"
                           />
         </div>
       </header>
