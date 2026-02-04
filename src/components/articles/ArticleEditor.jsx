@@ -145,6 +145,17 @@ export default function ArticleEditor({ articleId }) {
     );
   }
 
+  if (error || (!isLoading && !article)) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12">
+        <p className="text-gray-500 mb-4">Article not found or has been deleted</p>
+        <Button onClick={() => navigate(createPageUrl('Articles'))}>
+          Back to Articles
+        </Button>
+      </div>
+    );
+  }
+
   const completeness = calculateCompleteness(formData);
 
   return (
