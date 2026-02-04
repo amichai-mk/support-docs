@@ -6,7 +6,8 @@ import { createPageUrl } from '../../utils';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, Eye, CheckCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Save, Eye, CheckCircle } from 'lucide-react';
+import AIAssistant from './AIAssistant';
 import { toast } from 'sonner';
 import MetadataSection from './MetadataSection';
 import IssueSection from './IssueSection';
@@ -162,10 +163,14 @@ export default function ArticleEditor({ articleId }) {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" onClick={handleSave}>
-                <Save className="w-4 h-4 mr-2" />
-                Save Draft
-              </Button>
+                                <AIAssistant 
+                                  formData={formData}
+                                  onApplySuggestion={handleFieldChange}
+                                />
+                                <Button variant="outline" onClick={handleSave}>
+                                  <Save className="w-4 h-4 mr-2" />
+                                  Save Draft
+                                </Button>
               <Button 
                 onClick={handlePublish}
                 className="bg-green-600 hover:bg-green-700"
