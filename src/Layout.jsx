@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Layout({ children }) {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Header with Logo */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
                     <div className="flex justify-center py-3">
