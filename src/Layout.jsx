@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { createPageUrl } from './utils';
-import { Settings } from 'lucide-react';
+import { Settings, BookOpen } from 'lucide-react';
 
 export default function Layout({ children }) {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -44,16 +44,23 @@ export default function Layout({ children }) {
               className="h-16 dark:brightness-110 dark:contrast-110 cursor-pointer"
             />
           </Link>
-          <div className="w-10 flex justify-end">
-            {isAdmin && (
-              <Link 
-                to={createPageUrl('Settings')} 
-                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-[#0e1b55] transition-colors"
-              >
-                <Settings className="w-5 h-5" />
-              </Link>
-            )}
-          </div>
+          <div className="flex items-center gap-2">
+                            <Link 
+                              to={createPageUrl('ArticleLibrary')} 
+                              className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-[#0e1b55] transition-colors"
+                              title="Knowledge Base"
+                            >
+                              <BookOpen className="w-5 h-5" />
+                            </Link>
+                            {isAdmin && (
+                              <Link 
+                                to={createPageUrl('Settings')} 
+                                className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-[#0e1b55] transition-colors"
+                              >
+                                <Settings className="w-5 h-5" />
+                              </Link>
+                            )}
+                          </div>
         </div>
       </header>
 
