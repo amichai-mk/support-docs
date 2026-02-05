@@ -162,20 +162,21 @@ export default function ExportSyncTab() {
                     </div>
                     <span className="font-medium">Zoho Desk</span>
                   </div>
-                  <Badge variant="outline">Knowledge Base</Badge>
+                  <Badge variant="outline">Manual Export</Badge>
                 </div>
                 <p className="text-sm text-gray-500 mb-4">
-                  Sync articles to Zoho Desk Knowledge Base
+                  Export CSV for Zoho Desk bulk import
                 </p>
                 <Button 
-                  onClick={() => handleSync('zoho')}
-                  disabled={syncingTo !== null}
+                  onClick={() => handleExport('zoho')}
+                  disabled={exporting !== null}
                   className="w-full"
+                  variant="outline"
                 >
-                  {syncingTo === 'zoho' ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Syncing...</>
+                  {exporting === 'zoho' ? (
+                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Exporting...</>
                   ) : (
-                    <><Upload className="w-4 h-4 mr-2" /> Sync to Zoho</>
+                    <><Download className="w-4 h-4 mr-2" /> Export Zoho CSV</>
                   )}
                 </Button>
               </CardContent>
