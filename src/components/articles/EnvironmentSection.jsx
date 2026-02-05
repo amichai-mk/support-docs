@@ -1,16 +1,18 @@
 import React, { useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Lightbulb } from 'lucide-react';
+import { Label } from '@/components/ui/label';
+import { Lightbulb, Database } from 'lucide-react';
 import TextEditorToolbar from './TextEditorToolbar';
 
-const TEMPLATE = `Back-Office: Settings > Personnel
+const TEMPLATE = `Web: Settings > Personnel
 Table: Personnel
 Frequency: Consistent
 Interfaces: Mobile and web`;
 
-export default function EnvironmentSection({ value, onChange, onValidation }) {
+export default function EnvironmentSection({ value, onChange, onValidation, database, onDatabaseChange }) {
   const textareaRef = useRef(null);
   const onValidationRef = useRef(onValidation);
   onValidationRef.current = onValidation;
@@ -18,12 +20,20 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
   useEffect(() => {
     const issues = [];
     
+    if (!database || database.trim() === '') {
+      issues.push({
+        field: 'environment',
+        severity: 'error',
+        message: 'Database acronym is required'
+      });
+    }
+    
     if (value) {
-      if (!value.includes('Back-Office:')) {
+      if (!value.includes('Web:') && !value.includes('Back-Office:')) {
         issues.push({
           field: 'environment',
           severity: 'error',
-          message: 'Missing Back-Office: label'
+          message: 'Missing Web: or Back-Office: label'
         });
       }
       
@@ -50,26 +60,10 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
           message: 'Missing Interfaces: label'
         });
       }
-      
-      const charCount = value.length;
-      if (charCount < 100) {
-        issues.push({
-          field: 'environment',
-          severity: 'warning',
-          message: 'Environment section seems incomplete (min 100 characters recommended)'
-        });
-      }
-      if (charCount > 300) {
-        issues.push({
-          field: 'environment',
-          severity: 'warning',
-          message: 'Environment section too long (max 300 characters recommended)'
-        });
-      }
     }
     
     onValidationRef.current(issues);
-  }, [value]);
+  }, [value, database]);
 
   const insertTemplate = () => {
     onChange(TEMPLATE);
@@ -89,13 +83,29 @@ export default function EnvironmentSection({ value, onChange, onValidation }) {
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
+      <CardContent className="space-y-4">
+        {/* Database Acronym - Separate Required Field */}
+        <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+          <Label className="flex items-center gap-2 mb-2">
+            <Database className="w-4 h-4" />
+            Database Acronym <span className="text-red-500">*</span>
+          </Label>
+          <Input
+            value={database || ''}
+            onChange={(e) => onDatabaseChange(e.target.value.toUpperCase())}
+            placeholder="e.g., CLMA"
+            className="font-mono max-w-[200px] bg-white"
+            maxLength={10}
+          />
+          <p className="text-xs text-amber-700 mt-1">Used in the article ID (e.g., KCS-PER-0001-CLMA)</p>
+        </div>
+
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-900 space-y-2">
           <div>
             <strong>Format:</strong> Use labels for each field:
           </div>
           <div className="bg-white p-2 rounded border border-blue-300 text-xs font-mono">
-            Back-Office: Settings &gt; Personnel<br />
+            Web: Settings &gt; Personnel<br />
             Table: Personnel<br />
             Frequency: Consistent<br />
             Interfaces: Mobile and web

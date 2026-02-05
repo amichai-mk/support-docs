@@ -64,6 +64,7 @@ export default function ArticleEditor({ articleId }) {
         article_id: article.article_id || '',
         title: article.title || '',
         issue: article.issue || '',
+        database: article.database || '',
         environment: article.environment || '',
         cause: article.cause || '',
         resolutions: resolutions,
@@ -289,6 +290,8 @@ export default function ArticleEditor({ articleId }) {
                 <EnvironmentSection 
                   value={formData.environment}
                   onChange={(value) => handleFieldChange('environment', value)}
+                  database={formData.database}
+                  onDatabaseChange={(value) => handleFieldChange('database', value)}
                   onValidation={(issues) => setValidationIssues(prev => 
                     [...prev.filter(i => !i.field?.includes('environment')), ...issues]
                   )}
