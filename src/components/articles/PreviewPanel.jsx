@@ -66,18 +66,11 @@ export default function PreviewPanel({ formData }) {
     
     const logoUrl = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/698312b3fe9be2c697c692a1/eeb4e4b9a_ChatGPTImageFeb4202612_27_08PM.png';
     
-    const canvas = await html2canvas(contentRef.current, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-    });
-    
-    const imgData = canvas.toDataURL('image/png');
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
     
-    // Add logo header
+    // Load logo
     const logoImg = new Image();
     logoImg.crossOrigin = 'anonymous';
     
@@ -91,26 +84,57 @@ export default function PreviewPanel({ formData }) {
     const logoWidth = (logoImg.width / logoImg.height) * logoHeight;
     const logoX = (pageWidth - logoWidth) / 2;
     
-    pdf.addImage(logoImg, 'PNG', logoX, 5, logoWidth, logoHeight);
-    
-    // Add content below logo
+    // Content area settings
     const contentStartY = 25;
-    const imgWidth = pageWidth - 20;
+    const margin = 10;
+    const contentWidth = pageWidth - (margin * 2);
+    const usableHeight = pageHeight - contentStartY - margin;
+    
+    // Capture content at higher resolution
+    const canvas = await html2canvas(contentRef.current, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      windowWidth: contentRef.current.scrollWidth,
+    });
+    
+    const imgWidth = contentWidth;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
-    let heightLeft = imgHeight;
-    let position = contentStartY;
+    // Calculate how many pages we need
+    const totalPages = Math.ceil(imgHeight / usableHeight);
     
-    pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-    heightLeft -= (pageHeight - contentStartY);
-    
-    while (heightLeft > 0) {
-      pdf.addPage();
-      // Add logo to subsequent pages too
+    for (let page = 0; page < totalPages; page++) {
+      if (page > 0) {
+        pdf.addPage();
+      }
+      
+      // Add logo header on each page
       pdf.addImage(logoImg, 'PNG', logoX, 5, logoWidth, logoHeight);
-      position = contentStartY - (imgHeight - heightLeft);
-      pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-      heightLeft -= (pageHeight - contentStartY);
+      
+      // Calculate the portion of the canvas to render on this page
+      const sourceY = page * (usableHeight / imgHeight) * canvas.height;
+      const sourceHeight = Math.min(
+        (usableHeight / imgHeight) * canvas.height,
+        canvas.height - sourceY
+      );
+      
+      // Create a temporary canvas for this page's portion
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = canvas.width;
+      pageCanvas.height = sourceHeight;
+      
+      const ctx = pageCanvas.getContext('2d');
+      ctx.drawImage(
+        canvas,
+        0, sourceY, canvas.width, sourceHeight,
+        0, 0, canvas.width, sourceHeight
+      );
+      
+      const pageImgData = pageCanvas.toDataURL('image/png');
+      const pageImgHeight = (sourceHeight * imgWidth) / canvas.width;
+      
+      pdf.addImage(pageImgData, 'PNG', margin, contentStartY, imgWidth, pageImgHeight);
     }
     
     pdf.save(`${formData.article_id || 'article'}.pdf`);
