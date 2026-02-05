@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
-import { AlertCircle } from 'lucide-react';
+
 import TextEditorToolbar from './TextEditorToolbar';
 
 export default function IssueSection({ value, onChange, onValidation }) {
@@ -11,38 +11,13 @@ export default function IssueSection({ value, onChange, onValidation }) {
 
   useEffect(() => {
     const issues = [];
-    
-    if (value && value.length > 150) {
-      issues.push({
-        field: 'issue',
-        severity: 'error',
-        message: 'Issue too long. Max 150 characters (2 sentences).'
-      });
-    }
-    
-    const sentenceCount = (value || '').split(/[.!?]+/).filter(s => s.trim()).length;
-    if (sentenceCount > 2) {
-      issues.push({
-        field: 'issue',
-        severity: 'warning',
-        message: 'Issue should be max 2 sentences.'
-      });
-    }
-    
     onValidationRef.current(issues);
   }, [value]);
-
-  const charCount = (value || '').length;
 
   return (
     <Card>
       <CardHeader>
-        <div className="flex justify-between items-center">
-          <CardTitle>Issue (Problem Statement) *</CardTitle>
-          <span className={`text-sm ${charCount > 150 ? 'text-red-600 font-semibold' : 'text-gray-500'}`}>
-            {charCount}/150 characters
-          </span>
-        </div>
+        <CardTitle>Issue (Problem Statement) *</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-900">
@@ -62,12 +37,7 @@ export default function IssueSection({ value, onChange, onValidation }) {
           />
         </div>
         
-        {charCount > 150 && (
-          <div className="flex items-start gap-2 text-red-600 text-sm">
-            <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-            <span>Issue exceeds 150 characters. Please shorten to 2 sentences or less.</span>
-          </div>
-        )}
+
       </CardContent>
     </Card>
   );
