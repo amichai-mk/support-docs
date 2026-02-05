@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, FileText, Settings2, Users, Sparkles, BarChart3, Plug } from 'lucide-react';
+import { ArrowLeft, FileText, Settings2, Users, Sparkles, BarChart3, Plug, Upload } from 'lucide-react';
 import UserHeader from '../components/common/UserHeader';
 
 import TemplateConfigTab from '@/components/settings/TemplateConfigTab';
@@ -14,6 +14,7 @@ import UserManagementTab from '@/components/settings/UserManagementTab';
 import AIConfigTab from '@/components/settings/AIConfigTab';
 import InsightsTab from '@/components/settings/InsightsTab';
 import IntegrationsTab from '@/components/settings/IntegrationsTab';
+import ExportSyncTab from '@/components/settings/ExportSyncTab';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -106,7 +107,7 @@ export default function Settings() {
       {/* Content */}
       <div className="max-w-7xl mx-auto p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-6 mb-6">
+          <TabsList className="grid w-full grid-cols-7 mb-6">
             <TabsTrigger value="templates" className="flex items-center gap-2">
               <FileText className="w-4 h-4" />
               <span className="hidden sm:inline">Templates</span>
@@ -130,6 +131,10 @@ export default function Settings() {
             <TabsTrigger value="integrations" className="flex items-center gap-2">
               <Plug className="w-4 h-4" />
               <span className="hidden sm:inline">Integrations</span>
+            </TabsTrigger>
+            <TabsTrigger value="export" className="flex items-center gap-2">
+              <Upload className="w-4 h-4" />
+              <span className="hidden sm:inline">Export/Sync</span>
             </TabsTrigger>
           </TabsList>
 
@@ -164,6 +169,10 @@ export default function Settings() {
 
           <TabsContent value="integrations">
             <IntegrationsTab />
+          </TabsContent>
+
+          <TabsContent value="export">
+            <ExportSyncTab />
           </TabsContent>
         </Tabs>
       </div>
