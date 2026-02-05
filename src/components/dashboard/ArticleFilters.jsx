@@ -1,7 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { base44 } from '@/api/base44Client';
 
 export default function ArticleFilters({ statusFilter, productAreaFilter, onStatusChange, onProductAreaChange }) {
+  const [modules, setModules] = useState([]);
+
+  useEffect(() => {
+    const loadModules = async () => {
+      const settings = await base44.entities.AppSettings.filter({ setting_key: 'template_config' });
+      if (settings.length > 0 && settings[0].setting_value?.module_options) {
+        setModules(settings[0].setting_value.module_options);
+      }
+    };
+    loadModules();
+  }, []);
+
   return (
     <div className="flex gap-3">
       <Select value={statusFilter} onValueChange={onStatusChange}>
@@ -19,16 +32,15 @@ export default function ArticleFilters({ statusFilter, productAreaFilter, onStat
 
       <Select value={productAreaFilter} onValueChange={onProductAreaChange}>
         <SelectTrigger className="w-[160px] dark:bg-[#1a2a6c] dark:border-[#0e1b55] dark:text-white">
-          <SelectValue placeholder="Product Area" />
+          <SelectValue placeholder="Module" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All Areas</SelectItem>
-          <SelectItem value="Personnel">Personnel</SelectItem>
-          <SelectItem value="Incidents">Incidents</SelectItem>
-          <SelectItem value="Reporting">Reporting</SelectItem>
-          <SelectItem value="Scheduling">Scheduling</SelectItem>
-          <SelectItem value="Training">Training</SelectItem>
-          <SelectItem value="Administration">Administration</SelectItem>
+          <SelectItem value="all">All Modules</SelectItem>
+          {modules.map((module) => (
+            <SelectItem key={module.id} value={module.name}>
+              {module.name}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
     </div>
