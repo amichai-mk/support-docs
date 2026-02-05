@@ -1,17 +1,21 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Clock, Tag, Copy } from 'lucide-react';
+import { ArrowLeft, Clock, Tag, Copy, Edit, Star } from 'lucide-react';
 import { toast } from 'sonner';
+import StarRating from '../components/articles/StarRating';
+import ArticleHistoryLog from '../components/articles/ArticleHistoryLog';
 
 export default function ViewArticle() {
   const urlParams = new URLSearchParams(window.location.search);
   const articleId = urlParams.get('id');
+  const queryClient = useQueryClient();
+  const [qualityRating, setQualityRating] = useState(0);
 
   const { data: article, isLoading } = useQuery({
     queryKey: ['article', articleId],
@@ -72,7 +76,7 @@ export default function ViewArticle() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0e1b55]">
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="max-w-6xl mx-auto p-6">
         {/* Back Button */}
         <div className="mb-6 flex items-center justify-between">
           <Link to={createPageUrl('ArticleLibrary')}>
@@ -81,13 +85,49 @@ export default function ViewArticle() {
               Back to Library
             </Button>
           </Link>
-          <Button variant="outline" onClick={handleCopy} className="dark:bg-[#1a2a6c] dark:border-[#0e1b55] dark:text-white">
-            <Copy className="w-4 h-4 mr-2" />
-            Copy
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleCopy} className="dark:bg-[#1a2a6c] dark:border-[#0e1b55] dark:text-white">
+              <Copy className="w-4 h-4 mr-2" />
+              Copy
+            </Button>
+            <Link to={createPageUrl('EditArticle') + `?id=${articleId}&mode=validate`}>
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                <Edit className="w-4 h-4 mr-2" />
+                Validate Article
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        {/* Article Content */}
+        {/* Main Layout with Rating Sidebar */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* Quality Rating Sidebar */}
+          <div className="lg:col-span-1">
+            <Card className="dark:bg-[#1a2a6c] dark:border-[#0e1b55] sticky top-24">
+              <CardContent className="p-4">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-3 flex items-center gap-2">
+                  <Star className="w-4 h-4 text-yellow-500" />
+                  Quality Rating
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  Rate this article's quality and accuracy
+                </p>
+                <StarRating 
+                  rating={qualityRating} 
+                  onRatingChange={setQualityRating} 
+                  size="lg" 
+                />
+                {qualityRating > 0 && (
+                  <p className="text-sm text-green-600 dark:text-green-400 mt-2">
+                    Thank you for your feedback!
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Article Content */}
+          <div className="lg:col-span-3 space-y-6">
         <Card className="dark:bg-[#1a2a6c] dark:border-[#0e1b55]">
           <CardContent className="p-8 space-y-6">
             {/* Header */}
@@ -234,6 +274,11 @@ export default function ViewArticle() {
             )}
           </CardContent>
         </Card>
+
+        {/* Version History */}
+        <ArticleHistoryLog articleId={articleId} />
+          </div>
+        </div>
       </div>
     </div>
   );

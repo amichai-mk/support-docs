@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -6,7 +6,8 @@ import { createPageUrl } from '../../utils';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Save, Eye, CheckCircle, Trash2 } from 'lucide-react';
+import { ArrowLeft, Save, Eye, CheckCircle, Trash2, ShieldCheck } from 'lucide-react';
+import ValidationSummaryDialog from './ValidationSummaryDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,6 +38,12 @@ export default function ArticleEditor({ articleId }) {
   const [activeTab, setActiveTab] = useState('edit');
   const [formData, setFormData] = useState({});
   const [validationIssues, setValidationIssues] = useState([]);
+  const [showValidationDialog, setShowValidationDialog] = useState(false);
+  const originalDataRef = useRef(null);
+
+  // Check if in validation mode
+  const urlParams = new URLSearchParams(window.location.search);
+  const isValidationMode = urlParams.get('mode') === 'validate';
 
   const { data: article, isLoading, error } = useQuery({
     queryKey: ['article', articleId],
@@ -60,7 +67,7 @@ export default function ArticleEditor({ articleId }) {
         resolutions = [{ title: '', steps: [], verification: '' }];
       }
 
-      setFormData({
+      const data = {
         article_id: article.article_id || '',
         title: article.title || '',
         issue: article.issue || '',
@@ -72,9 +79,15 @@ export default function ArticleEditor({ articleId }) {
         status: article.status || 'draft',
         product_area: article.product_area || '',
         tags: article.tags || [],
-      });
+      };
+      setFormData(data);
+      
+      // Store original data for validation comparison
+      if (isValidationMode && !originalDataRef.current) {
+        originalDataRef.current = JSON.parse(JSON.stringify(data));
+      }
     }
-  }, [article]);
+  }, [article, isValidationMode]);
 
   const updateMutation = useMutation({
     mutationFn: (data) => base44.entities.Article.update(articleId, data),
@@ -154,6 +167,15 @@ export default function ArticleEditor({ articleId }) {
         status: 'published',
         completeness_score: completeness,
       });
+
+      // Create history entry for publish
+      const user = await base44.auth.me();
+      await base44.entities.ArticleHistory.create({
+        article_id: articleId,
+        action_type: 'published',
+        validator_email: user?.email,
+        validator_name: user?.full_name,
+      });
       
       queryClient.invalidateQueries(['article', articleId]);
       queryClient.invalidateQueries(['articles']);
@@ -164,6 +186,54 @@ export default function ArticleEditor({ articleId }) {
     } catch (error) {
       setIsPublishing(false);
       toast.error('Failed to publish article');
+    }
+  };
+
+  const handleValidateClick = () => {
+    const completeness = calculateCompleteness(formData);
+    
+    if (completeness < 100) {
+      toast.error('Article must be 100% complete before validation');
+      return;
+    }
+    setShowValidationDialog(true);
+  };
+
+  const handleValidationConfirm = async ({ summary, rating }) => {
+    try {
+      setIsPublishing(true);
+      debouncedSave.cancel();
+
+      const completeness = calculateCompleteness(formData);
+      
+      await base44.entities.Article.update(articleId, {
+        ...formData,
+        status: 'published',
+        completeness_score: completeness,
+      });
+
+      // Create history entry
+      const user = await base44.auth.me();
+      await base44.entities.ArticleHistory.create({
+        article_id: articleId,
+        action_type: 'validated',
+        validator_email: user?.email,
+        validator_name: user?.full_name,
+        quality_rating: rating,
+        changes_summary: summary,
+        previous_snapshot: originalDataRef.current,
+      });
+
+      queryClient.invalidateQueries(['article', articleId]);
+      queryClient.invalidateQueries(['articles']);
+      queryClient.invalidateQueries(['article-history', articleId]);
+      
+      setShowValidationDialog(false);
+      toast.success('Article validated successfully');
+      navigate(createPageUrl('ViewArticle') + `?id=${articleId}`);
+    } catch (error) {
+      setIsPublishing(false);
+      toast.error('Failed to validate article');
     }
   };
 
@@ -211,7 +281,10 @@ export default function ArticleEditor({ articleId }) {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate(createPageUrl('Dashboard'))}
+                onClick={() => isValidationMode 
+                  ? navigate(createPageUrl('ViewArticle') + `?id=${articleId}`)
+                  : navigate(createPageUrl('Dashboard'))
+                }
               >
                 <ArrowLeft className="w-4 h-4" />
               </Button>
@@ -274,14 +347,25 @@ export default function ArticleEditor({ articleId }) {
                                   <Save className="w-4 h-4 mr-2" />
                                   Save Draft
                                 </Button>
-              <Button 
-                onClick={handlePublish}
-                className="bg-green-600 hover:bg-green-700"
-                disabled={completeness < 100 || formData.resolutions?.some(res => res.steps?.length >= 10)}
-              >
-                <CheckCircle className="w-4 h-4 mr-2" />
-                Publish
-              </Button>
+              {isValidationMode ? (
+                <Button 
+                  onClick={handleValidateClick}
+                  className="bg-blue-600 hover:bg-blue-700"
+                  disabled={completeness < 100 || formData.resolutions?.some(res => res.steps?.length >= 10)}
+                >
+                  <ShieldCheck className="w-4 h-4 mr-2" />
+                  Validate
+                </Button>
+              ) : (
+                <Button 
+                  onClick={handlePublish}
+                  className="bg-green-600 hover:bg-green-700"
+                  disabled={completeness < 100 || formData.resolutions?.some(res => res.steps?.length >= 10)}
+                >
+                  <CheckCircle className="w-4 h-4 mr-2" />
+                  Publish
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -363,6 +447,13 @@ export default function ArticleEditor({ articleId }) {
           </div>
         </div>
       </div>
+
+      <ValidationSummaryDialog
+        open={showValidationDialog}
+        onOpenChange={setShowValidationDialog}
+        onConfirm={handleValidationConfirm}
+        isLoading={isPublishing}
+      />
     </div>
   );
 }
