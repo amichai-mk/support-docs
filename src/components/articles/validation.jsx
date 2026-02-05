@@ -2,8 +2,9 @@ export const calculateCompleteness = (formData) => {
   let score = 0;
   const weights = {
     title: 10,
+    database: 5,
     issue: 20,
-    environment: 20,
+    environment: 15,
     cause: 20,
     resolutions: 30  // Combined steps + verification
   };
@@ -12,13 +13,17 @@ export const calculateCompleteness = (formData) => {
     score += weights.title;
   }
 
+  if (formData.database && formData.database.trim() !== '') {
+    score += weights.database;
+  }
+
   if (formData.issue && formData.issue.trim() !== '') {
     score += weights.issue;
   }
 
   if (formData.environment && formData.environment.trim() !== '') {
     const hasRequiredLabels = 
-      formData.environment.includes('Back-Office:') &&
+      (formData.environment.includes('Web:') || formData.environment.includes('Back-Office:')) &&
       formData.environment.includes('Table:') &&
       formData.environment.includes('Frequency:') &&
       formData.environment.includes('Interfaces:');
@@ -75,6 +80,11 @@ export const validateArticle = (formData) => {
   // Issue validation
   if (!formData.issue || formData.issue.trim() === '') {
     issues.push({ field: 'issue', severity: 'error', message: 'Issue section is required' });
+  }
+
+  // Database validation
+  if (!formData.database || formData.database.trim() === '') {
+    issues.push({ field: 'database', severity: 'error', message: 'Database acronym is required' });
   }
 
   // Environment validation
