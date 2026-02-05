@@ -39,20 +39,45 @@ export default function CreateArticleDialog({ open, onOpenChange }) {
   const [activeTab, setActiveTab] = useState('manual');
   const [aiPrompt, setAiPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [moduleUsageCounts, setModuleUsageCounts] = useState({});
 
   useEffect(() => {
     if (open) {
-      const loadSettings = async () => {
-        const settings = await base44.entities.AppSettings.filter({ setting_key: 'template_config' });
+      const loadSettingsAndUsage = async () => {
+        const [settings, articles] = await Promise.all([
+          base44.entities.AppSettings.filter({ setting_key: 'template_config' }),
+          base44.entities.Article.list()
+        ]);
+        
         if (settings.length > 0 && settings[0].setting_value) {
           const config = settings[0].setting_value;
           if (config.module_options) setModuleOptions(config.module_options);
           if (config.article_id_format) setIdFormat(config.article_id_format);
         }
+
+        // Count module usage from articles
+        const counts = {};
+        articles.forEach(article => {
+          if (article.article_id) {
+            const match = article.article_id.match(/KCS-([A-Z]+)-/);
+            if (match) {
+              counts[match[1]] = (counts[match[1]] || 0) + 1;
+            }
+          }
+        });
+        setModuleUsageCounts(counts);
       };
-      loadSettings();
+      loadSettingsAndUsage();
     }
   }, [open]);
+
+  const getSortedModules = () => {
+    return [...moduleOptions].sort((a, b) => {
+      const countA = moduleUsageCounts[a.value] || 0;
+      const countB = moduleUsageCounts[b.value] || 0;
+      return countB - countA;
+    });
+  };
 
   const generateArticleId = async (module) => {
     const allArticles = await base44.entities.Article.list();
@@ -201,10 +226,13 @@ Product Area: ${productArea}`,
                   <SelectValue placeholder="Select a module..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {moduleOptions.map((mod) => (
+                  {getSortedModules().map((mod) => (
                     <SelectItem key={mod.value} value={mod.value}>
                       <span className="font-mono mr-2">{mod.value}</span>
                       <span className="text-gray-500">- {mod.label}</span>
+                      {moduleUsageCounts[mod.value] > 0 && (
+                        <span className="ml-2 text-xs text-gray-400">({moduleUsageCounts[mod.value]})</span>
+                      )}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -246,10 +274,13 @@ Product Area: ${productArea}`,
                   <SelectValue placeholder="Select a module..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {moduleOptions.map((mod) => (
+                  {getSortedModules().map((mod) => (
                     <SelectItem key={mod.value} value={mod.value}>
                       <span className="font-mono mr-2">{mod.value}</span>
                       <span className="text-gray-500">- {mod.label}</span>
+                      {moduleUsageCounts[mod.value] > 0 && (
+                        <span className="ml-2 text-xs text-gray-400">({moduleUsageCounts[mod.value]})</span>
+                      )}
                     </SelectItem>
                   ))}
                 </SelectContent>
