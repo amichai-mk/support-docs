@@ -135,7 +135,7 @@ export default function ArticleEditor({ articleId }) {
     });
     
     toast.success('Article published successfully');
-    navigate(createPageUrl('Articles'));
+    navigate(createPageUrl('Dashboard'));
   };
 
   const deleteMutation = useMutation({
@@ -143,7 +143,7 @@ export default function ArticleEditor({ articleId }) {
     onSuccess: () => {
       queryClient.invalidateQueries(['articles']);
       toast.success('Article discarded');
-      navigate(createPageUrl('Articles'));
+      navigate(createPageUrl('Dashboard'));
     },
   });
 
@@ -182,7 +182,7 @@ export default function ArticleEditor({ articleId }) {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate(createPageUrl('Articles'))}
+                onClick={() => navigate(createPageUrl('Dashboard'))}
               >
                 <ArrowLeft className="w-4 h-4" />
               </Button>
