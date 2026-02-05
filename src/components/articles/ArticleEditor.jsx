@@ -142,14 +142,22 @@ export default function ArticleEditor({ articleId }) {
       return;
     }
 
-    await updateMutation.mutateAsync({
-      ...formData,
-      status: 'published',
-      completeness_score: completeness,
-    });
-    
-    toast.success('Article published successfully');
-    navigate(createPageUrl('Dashboard'));
+    try {
+      await base44.entities.Article.update(articleId, {
+        ...formData,
+        status: 'published',
+        completeness_score: completeness,
+      });
+      
+      queryClient.invalidateQueries(['article', articleId]);
+      queryClient.invalidateQueries(['articles']);
+      queryClient.invalidateQueries(['published-articles']);
+      
+      toast.success('Article published successfully');
+      navigate(createPageUrl('Dashboard'));
+    } catch (error) {
+      toast.error('Failed to publish article');
+    }
   };
 
   const deleteMutation = useMutation({
