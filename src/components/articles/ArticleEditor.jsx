@@ -84,8 +84,11 @@ export default function ArticleEditor({ articleId }) {
   });
 
   // Auto-save with debounce
+  const [isPublishing, setIsPublishing] = useState(false);
+  
   const debouncedSave = useCallback(
-    debounce(async (data) => {
+    debounce(async (data, publishing) => {
+      if (publishing) return; // Don't auto-save while publishing
       const completeness = calculateCompleteness(data);
       await updateMutation.mutateAsync({
         ...data,
@@ -97,10 +100,10 @@ export default function ArticleEditor({ articleId }) {
   );
 
   useEffect(() => {
-    if (formData.title) {
-      debouncedSave(formData);
+    if (formData.title && !isPublishing) {
+      debouncedSave(formData, isPublishing);
     }
-  }, [formData, debouncedSave]);
+  }, [formData, debouncedSave, isPublishing]);
 
   const handleFieldChange = (field, value) => {
     setFormData(prev => {
@@ -143,6 +146,9 @@ export default function ArticleEditor({ articleId }) {
     }
 
     try {
+      setIsPublishing(true);
+      debouncedSave.cancel(); // Cancel any pending auto-save
+      
       await base44.entities.Article.update(articleId, {
         ...formData,
         status: 'published',
@@ -156,6 +162,7 @@ export default function ArticleEditor({ articleId }) {
       toast.success('Article published successfully');
       navigate(createPageUrl('Dashboard'));
     } catch (error) {
+      setIsPublishing(false);
       toast.error('Failed to publish article');
     }
   };
