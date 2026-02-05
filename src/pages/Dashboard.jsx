@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { createPageUrl } from '../utils';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import AgentAnalytics from '../components/dashboard/AgentAnalytics';
@@ -9,13 +7,14 @@ import ArticlesLibrary from '../components/dashboard/ArticlesLibrary';
 import ArticleFilters from '../components/dashboard/ArticleFilters';
 import IntegrationLinks from '../components/dashboard/IntegrationLinks';
 import DarkModeToggle from '../components/dashboard/DarkModeToggle';
+import CreateArticleDialog from '../components/dashboard/CreateArticleDialog';
 
 export default function Dashboard() {
-  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [productAreaFilter, setProductAreaFilter] = useState('all');
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
 
   useEffect(() => {
     const savedMode = localStorage.getItem('darkMode');
@@ -52,7 +51,7 @@ export default function Dashboard() {
           <div className="flex items-center gap-3">
             <DarkModeToggle isDark={isDarkMode} onToggle={toggleDarkMode} />
             <Button 
-              onClick={() => navigate(createPageUrl('CreateArticle'))}
+              onClick={() => setShowCreateDialog(true)}
               className="bg-[#c41230] hover:bg-[#a30f28] text-white"
             >
               <Plus className="w-4 h-4 mr-2" />
@@ -96,6 +95,11 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      <CreateArticleDialog 
+        open={showCreateDialog} 
+        onOpenChange={setShowCreateDialog} 
+      />
     </div>
   );
 }
