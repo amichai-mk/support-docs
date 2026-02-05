@@ -103,7 +103,20 @@ export default function ArticleEditor({ articleId }) {
   }, [formData, debouncedSave]);
 
   const handleFieldChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData(prev => {
+      const newData = { ...prev, [field]: value };
+      
+      // Update article_id when database changes
+      if (field === 'database' && prev.article_id) {
+        const idParts = prev.article_id.split('-');
+        if (idParts.length >= 4) {
+          idParts[idParts.length - 1] = value || 'DB';
+          newData.article_id = idParts.join('-');
+        }
+      }
+      
+      return newData;
+    });
   };
 
   const handleSave = async () => {
