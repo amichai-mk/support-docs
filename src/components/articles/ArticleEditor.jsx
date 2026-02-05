@@ -42,6 +42,7 @@ export default function ArticleEditor({ articleId }) {
     queryKey: ['article', articleId],
     queryFn: () => base44.entities.Article.get(articleId),
     enabled: !!articleId,
+    retry: false,
   });
 
   useEffect(() => {
