@@ -17,7 +17,7 @@ import {
   LineChart,
   Line,
 } from 'recharts';
-import { FileText, Users, CheckCircle, Clock, TrendingUp, AlertTriangle } from 'lucide-react';
+import { FileText, Users, CheckCircle, Clock, TrendingUp, AlertTriangle, Search, XCircle } from 'lucide-react';
 import { format, subDays, startOfDay, isAfter } from 'date-fns';
 
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#6b7280'];
@@ -33,7 +33,32 @@ export default function InsightsTab() {
     queryFn: () => base44.entities.User.list(),
   });
 
-  const isLoading = articlesLoading || usersLoading;
+  const { data: searchLogs = [], isLoading: searchLogsLoading } = useQuery({
+    queryKey: ['search-logs-insights'],
+    queryFn: () => base44.entities.SearchLog.list('-created_date', 500),
+  });
+
+  const isLoading = articlesLoading || usersLoading || searchLogsLoading;
+
+  // Content Gap Analysis - searches with no results
+  const failedSearches = searchLogs.filter(log => !log.had_results);
+  const failedSearchTerms = failedSearches.reduce((acc, log) => {
+    const term = log.query?.toLowerCase().trim();
+    if (term) {
+      acc[term] = (acc[term] || 0) + 1;
+    }
+    return acc;
+  }, {});
+
+  const topContentGaps = Object.entries(failedSearchTerms)
+    .map(([term, count]) => ({ term, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
+  const totalSearches = searchLogs.length;
+  const searchSuccessRate = totalSearches > 0
+    ? Math.round((searchLogs.filter(l => l.had_results).length / totalSearches) * 100)
+    : 0;
 
   // Calculate metrics
   const totalArticles = articles.length;
@@ -261,6 +286,68 @@ export default function InsightsTab() {
                 <p className="text-gray-500 text-center py-4">No contributors yet</p>
               )}
             </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Content Gap Analysis */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Search className="w-5 h-5 text-blue-600" />
+              Search Analytics
+            </CardTitle>
+            <CardDescription>Search performance and success rate</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between p-4 bg-blue-50 rounded-lg">
+                <div>
+                  <p className="text-sm text-gray-600">Total Searches</p>
+                  <p className="text-2xl font-bold text-blue-600">{totalSearches}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">Success Rate</p>
+                  <p className="text-2xl font-bold text-green-600">{searchSuccessRate}%</p>
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">No Results</p>
+                  <p className="text-2xl font-bold text-red-600">{failedSearches.length}</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <XCircle className="w-5 h-5 text-red-600" />
+              Content Gaps
+            </CardTitle>
+            <CardDescription>Top search terms with no results - consider creating articles for these topics</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {topContentGaps.length > 0 ? (
+              <div className="space-y-2">
+                {topContentGaps.map((gap, index) => (
+                  <div key={gap.term} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <span className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-red-600 text-xs font-semibold">
+                        {index + 1}
+                      </span>
+                      <span className="text-sm font-medium">"{gap.term}"</span>
+                    </div>
+                    <Badge variant="outline" className="text-red-600 border-red-200">
+                      {gap.count} search{gap.count > 1 ? 'es' : ''}
+                    </Badge>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 text-center py-4">No content gaps detected yet. Search data will appear here as users search.</p>
+            )}
           </CardContent>
         </Card>
       </div>
