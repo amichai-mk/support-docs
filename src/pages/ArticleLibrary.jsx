@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
@@ -13,6 +13,21 @@ import { Button } from '@/components/ui/button';
 export default function ArticleLibrary() {
   const [searchTerm, setSearchTerm] = useState('');
   const [moduleFilter, setModuleFilter] = useState('all');
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await base44.auth.me();
+      setUserName(user?.full_name || user?.email || 'Agent');
+    };
+    fetchUser();
+  }, []);
 
   const { data: articles = [], isLoading } = useQuery({
     queryKey: ['published-articles'],
@@ -51,12 +66,19 @@ export default function ArticleLibrary() {
       <div className="max-w-5xl mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
-          <Link to={createPageUrl('Dashboard')}>
-            <Button variant="ghost" className="mb-4 dark:text-white dark:hover:bg-[#1a2a6c]">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Dashboard
-            </Button>
-          </Link>
+          <div className="flex items-center justify-between mb-4">
+            <Link to={createPageUrl('Dashboard')}>
+              <Button variant="ghost" className="dark:text-white dark:hover:bg-[#1a2a6c]">
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back to Dashboard
+              </Button>
+            </Link>
+            <div className="text-right text-sm text-gray-600 dark:text-gray-300">
+              <div className="font-medium">{userName}</div>
+              <div>{currentTime.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+              <div>{currentTime.toLocaleTimeString()}</div>
+            </div>
+          </div>
           <h1 className="text-3xl font-bold text-[#0e1b55] dark:text-white mb-2">Knowledge Base</h1>
           <p className="text-gray-600 dark:text-gray-300">Search and browse published KCS articles</p>
         </div>
