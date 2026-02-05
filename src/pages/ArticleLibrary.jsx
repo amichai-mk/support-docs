@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, FileText, Clock, Tag, ChevronRight } from 'lucide-react';
+import { Search, FileText, Clock, Tag, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function ArticleLibrary() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,6 +51,12 @@ export default function ArticleLibrary() {
       <div className="max-w-5xl mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
+          <Link to={createPageUrl('Dashboard')}>
+            <Button variant="ghost" className="mb-4 dark:text-white dark:hover:bg-[#1a2a6c]">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
           <h1 className="text-3xl font-bold text-[#0e1b55] dark:text-white mb-2">Knowledge Base</h1>
           <p className="text-gray-600 dark:text-gray-300">Search and browse published KCS articles</p>
         </div>

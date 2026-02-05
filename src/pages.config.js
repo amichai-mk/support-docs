@@ -47,19 +47,19 @@
  *
  * The mainPage value must match a key in the PAGES object exactly.
  */
+import ArticleLibrary from './pages/ArticleLibrary';
 import Dashboard from './pages/Dashboard';
 import EditArticle from './pages/EditArticle';
 import Settings from './pages/Settings';
-import ArticleLibrary from './pages/ArticleLibrary';
 import ViewArticle from './pages/ViewArticle';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
+    "ArticleLibrary": ArticleLibrary,
     "Dashboard": Dashboard,
     "EditArticle": EditArticle,
     "Settings": Settings,
-    "ArticleLibrary": ArticleLibrary,
     "ViewArticle": ViewArticle,
 }
 
