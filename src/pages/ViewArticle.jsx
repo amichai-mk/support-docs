@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
@@ -6,8 +6,10 @@ import { createPageUrl } from '../utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Clock, Tag, Copy, Edit, Star } from 'lucide-react';
+import { ArrowLeft, Clock, Tag, Copy, Edit, Star, Download } from 'lucide-react';
 import { toast } from 'sonner';
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import StarRating from '../components/articles/StarRating';
 import ArticleHistoryLog from '../components/articles/ArticleHistoryLog';
 
@@ -16,6 +18,7 @@ export default function ViewArticle() {
   const articleId = urlParams.get('id');
   const queryClient = useQueryClient();
   const [qualityRating, setQualityRating] = useState(0);
+  const contentRef = useRef(null);
 
   const { data: article, isLoading } = useQuery({
     queryKey: ['article', articleId],
@@ -48,6 +51,88 @@ export default function ViewArticle() {
     }
     await navigator.clipboard.writeText(text);
     toast.success('Article copied to clipboard');
+  };
+
+  const handleExportPDF = async () => {
+    if (!contentRef.current) return;
+    
+    toast.info('Generating PDF...');
+    
+    const logoUrl = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/698312b3fe9be2c697c692a1/eeb4e4b9a_ChatGPTImageFeb4202612_27_08PM.png';
+    
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    
+    // Load logo
+    const logoImg = new Image();
+    logoImg.crossOrigin = 'anonymous';
+    
+    await new Promise((resolve) => {
+      logoImg.onload = resolve;
+      logoImg.onerror = resolve;
+      logoImg.src = logoUrl;
+    });
+    
+    const logoHeight = 15;
+    const logoWidth = (logoImg.width / logoImg.height) * logoHeight;
+    const logoX = (pageWidth - logoWidth) / 2;
+    
+    // Content area settings
+    const contentStartY = 25;
+    const margin = 10;
+    const contentWidth = pageWidth - (margin * 2);
+    const usableHeight = pageHeight - contentStartY - margin;
+    
+    // Capture content at higher resolution
+    const canvas = await html2canvas(contentRef.current, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      windowWidth: contentRef.current.scrollWidth,
+    });
+    
+    const imgWidth = contentWidth;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    // Calculate how many pages we need
+    const totalPages = Math.ceil(imgHeight / usableHeight);
+    
+    for (let page = 0; page < totalPages; page++) {
+      if (page > 0) {
+        pdf.addPage();
+      }
+      
+      // Add logo header on each page
+      pdf.addImage(logoImg, 'PNG', logoX, 5, logoWidth, logoHeight);
+      
+      // Calculate the portion of the canvas to render on this page
+      const sourceY = page * (usableHeight / imgHeight) * canvas.height;
+      const sourceHeight = Math.min(
+        (usableHeight / imgHeight) * canvas.height,
+        canvas.height - sourceY
+      );
+      
+      // Create a temporary canvas for this page's portion
+      const pageCanvas = document.createElement('canvas');
+      pageCanvas.width = canvas.width;
+      pageCanvas.height = sourceHeight;
+      
+      const ctx = pageCanvas.getContext('2d');
+      ctx.drawImage(
+        canvas,
+        0, sourceY, canvas.width, sourceHeight,
+        0, 0, canvas.width, sourceHeight
+      );
+      
+      const pageImgData = pageCanvas.toDataURL('image/png');
+      const pageImgHeight = (sourceHeight * imgWidth) / canvas.width;
+      
+      pdf.addImage(pageImgData, 'PNG', margin, contentStartY, imgWidth, pageImgHeight);
+    }
+    
+    pdf.save(`${article.article_id || 'article'}.pdf`);
+    toast.success('PDF exported successfully');
   };
 
   if (isLoading) {
@@ -90,6 +175,10 @@ export default function ViewArticle() {
               <Copy className="w-4 h-4 mr-2" />
               Copy
             </Button>
+            <Button variant="outline" onClick={handleExportPDF} className="dark:bg-[#1a2a6c] dark:border-[#0e1b55] dark:text-white">
+              <Download className="w-4 h-4 mr-2" />
+              Export PDF
+            </Button>
             <Link to={createPageUrl('EditArticle') + `?id=${articleId}&mode=validate`}>
               <Button className="bg-blue-600 hover:bg-blue-700">
                 <Edit className="w-4 h-4 mr-2" />
@@ -129,7 +218,7 @@ export default function ViewArticle() {
           {/* Article Content */}
           <div className="lg:col-span-3 space-y-6">
         <Card className="dark:bg-[#1a2a6c] dark:border-[#0e1b55]">
-          <CardContent className="p-8 space-y-6">
+          <CardContent className="p-8 space-y-6" ref={contentRef}
             {/* Header */}
             <div>
               <div className="flex items-center gap-2 mb-3">
