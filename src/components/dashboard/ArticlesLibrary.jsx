@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
@@ -15,7 +15,7 @@ const statusConfig = {
   archived: { icon: Archive, color: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' },
 };
 
-export default function ArticlesLibrary({ searchTerm, statusFilter, productAreaFilter }) {
+export default function ArticlesLibrary({ searchTerm, statusFilter, productAreaFilter, onResultsCount }) {
   const { data: articles, isLoading } = useQuery({
     queryKey: ['articles'],
     queryFn: () => base44.entities.Article.list('-updated_date'),
@@ -30,6 +30,13 @@ export default function ArticlesLibrary({ searchTerm, statusFilter, productAreaF
     
     return matchesSearch && matchesStatus && matchesProductArea;
   }) || [];
+
+  // Report results count back to parent for search logging
+  useEffect(() => {
+    if (onResultsCount && searchTerm) {
+      onResultsCount(filteredArticles.length);
+    }
+  }, [filteredArticles.length, searchTerm, onResultsCount]);
 
   if (isLoading) {
     return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import AgentAnalytics from '../components/dashboard/AgentAnalytics';
@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [productAreaFilter, setProductAreaFilter] = useState('all');
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const searchCallbackRef = useRef(null);
 
   useEffect(() => {
     const savedMode = localStorage.getItem('darkMode');
@@ -35,8 +36,16 @@ export default function Dashboard() {
     }
   };
 
-  const handleSearch = (term) => {
+  const handleSearch = (term, callback) => {
     setSearchTerm(term);
+    searchCallbackRef.current = callback;
+  };
+
+  const handleSearchResults = (resultsCount) => {
+    if (searchCallbackRef.current) {
+      searchCallbackRef.current(resultsCount);
+      searchCallbackRef.current = null;
+    }
   };
 
   return (
@@ -86,6 +95,7 @@ export default function Dashboard() {
               searchTerm={searchTerm}
               statusFilter={statusFilter}
               productAreaFilter={productAreaFilter}
+              onResultsCount={handleSearchResults}
             />
           </div>
 
