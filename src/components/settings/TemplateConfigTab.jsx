@@ -4,9 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Save, RotateCcw, Plus, X } from 'lucide-react';
+import { Save, RotateCcw, Plus, X, GripVertical } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 
 const DEFAULT_ENVIRONMENT_TEMPLATE = `Back-Office: Settings > Personnel
 Table: Personnel
@@ -70,6 +71,16 @@ export default function TemplateConfigTab({ settings, onSave }) {
     setModuleOptions(moduleOptions.filter((_, i) => i !== index));
   };
 
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
+    
+    const items = Array.from(moduleOptions);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+    
+    setModuleOptions(items);
+  };
+
   // Generate preview of the ID format
   const getFormatPreview = () => {
     return articleIdFormat
@@ -106,20 +117,45 @@ export default function TemplateConfigTab({ settings, onSave }) {
 
           <div className="space-y-3">
             <Label>Module Identifiers</Label>
-            <div className="flex flex-wrap gap-2">
-              {moduleOptions.map((mod, index) => (
-                <Badge key={index} variant="secondary" className="flex items-center gap-1 py-1 px-2">
-                  <span className="font-mono font-semibold">{mod.value}</span>
-                  <span className="text-gray-500">({mod.label})</span>
-                  <button 
-                    onClick={() => removeModuleOption(index)}
-                    className="ml-1 text-gray-400 hover:text-red-500"
+            <p className="text-sm text-gray-500">Drag to reorder. The order here determines the dropdown order.</p>
+            <DragDropContext onDragEnd={handleDragEnd}>
+              <Droppable droppableId="modules" direction="vertical">
+                {(provided) => (
+                  <div 
+                    {...provided.droppableProps} 
+                    ref={provided.innerRef}
+                    className="space-y-2"
                   >
-                    <X className="w-3 h-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
+                    {moduleOptions.map((mod, index) => (
+                      <Draggable key={mod.value} draggableId={mod.value} index={index}>
+                        {(provided, snapshot) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            className={`flex items-center gap-2 p-2 rounded-lg border ${
+                              snapshot.isDragging ? 'bg-blue-50 border-blue-300 shadow-lg' : 'bg-white border-gray-200'
+                            }`}
+                          >
+                            <div {...provided.dragHandleProps} className="cursor-grab text-gray-400 hover:text-gray-600">
+                              <GripVertical className="w-4 h-4" />
+                            </div>
+                            <span className="font-mono font-semibold text-sm">{mod.value}</span>
+                            <span className="text-gray-500 text-sm">- {mod.label}</span>
+                            <button 
+                              onClick={() => removeModuleOption(index)}
+                              className="ml-auto text-gray-400 hover:text-red-500"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
             <div className="flex gap-2 items-center">
               <Input
                 value={newModuleCode}

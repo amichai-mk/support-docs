@@ -71,13 +71,8 @@ export default function CreateArticleDialog({ open, onOpenChange }) {
     }
   }, [open]);
 
-  const getSortedModules = () => {
-    return [...moduleOptions].sort((a, b) => {
-      const countA = moduleUsageCounts[a.value] || 0;
-      const countB = moduleUsageCounts[b.value] || 0;
-      return countB - countA;
-    });
-  };
+  // Modules are already sorted by admin in settings, just return as-is
+  const getSortedModules = () => moduleOptions;
 
   const generateArticleId = async (module) => {
     const allArticles = await base44.entities.Article.list();
