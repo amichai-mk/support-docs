@@ -37,8 +37,8 @@ export default function ArticleFilters({ statusFilter, productAreaFilter, onStat
         <SelectContent>
           <SelectItem value="all">All Modules</SelectItem>
           {modules.map((module) => (
-            <SelectItem key={module.id} value={module.name}>
-              {module.name}
+            <SelectItem key={module.value} value={module.label}>
+              {module.label}
             </SelectItem>
           ))}
         </SelectContent>
