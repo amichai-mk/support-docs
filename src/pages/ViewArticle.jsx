@@ -218,7 +218,7 @@ export default function ViewArticle() {
           {/* Article Content */}
           <div className="lg:col-span-3 space-y-6">
         <Card className="dark:bg-[#1a2a6c] dark:border-[#0e1b55]">
-          <CardContent className="p-8 space-y-6" ref={contentRef}
+          <CardContent className="p-8 space-y-6" ref={contentRef}>
             {/* Header */}
             <div>
               <div className="flex items-center gap-2 mb-3">
