@@ -6,6 +6,7 @@ import { createPageUrl } from '../utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, FileText, Settings2, Users, Sparkles, BarChart3, Plug } from 'lucide-react';
+import UserHeader from '../components/common/UserHeader';
 
 import TemplateConfigTab from '@/components/settings/TemplateConfigTab';
 import SectionsFieldsTab from '@/components/settings/SectionsFieldsTab';
@@ -83,18 +84,21 @@ export default function Settings() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-[84px] z-40">
         <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigate(createPageUrl('Dashboard'))}
-            >
-              <ArrowLeft className="w-4 h-4" />
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-              <p className="text-sm text-gray-500">Manage your KCS knowledge base configuration</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => navigate(createPageUrl('Dashboard'))}
+              >
+                <ArrowLeft className="w-4 h-4" />
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
+                <p className="text-sm text-gray-500">Manage your KCS knowledge base configuration</p>
+              </div>
             </div>
+            <UserHeader />
           </div>
         </div>
       </div>

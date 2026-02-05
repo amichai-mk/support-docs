@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import UserHeader from '../components/common/UserHeader';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '../utils';
 import { Input } from '@/components/ui/input';
@@ -13,21 +14,6 @@ import { Button } from '@/components/ui/button';
 export default function ArticleLibrary() {
   const [searchTerm, setSearchTerm] = useState('');
   const [moduleFilter, setModuleFilter] = useState('all');
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [userName, setUserName] = useState('');
-
-  useEffect(() => {
-    const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const user = await base44.auth.me();
-      setUserName(user?.full_name || user?.email || 'Agent');
-    };
-    fetchUser();
-  }, []);
 
   const { data: articles = [], isLoading } = useQuery({
     queryKey: ['published-articles'],
@@ -73,11 +59,7 @@ export default function ArticleLibrary() {
                 Back to Dashboard
               </Button>
             </Link>
-            <div className="text-right text-sm text-gray-600 dark:text-gray-300">
-              <div className="font-medium">{userName}</div>
-              <div>{currentTime.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
-              <div>{currentTime.toLocaleTimeString()}</div>
-            </div>
+            <UserHeader />
           </div>
           <h1 className="text-3xl font-bold text-[#0e1b55] dark:text-white mb-2">Knowledge Base</h1>
           <p className="text-gray-600 dark:text-gray-300">Search and browse published KCS articles</p>

@@ -12,6 +12,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import StarRating from '../components/articles/StarRating';
 import ArticleHistoryLog from '../components/articles/ArticleHistoryLog';
+import UserHeader from '../components/common/UserHeader';
 
 export default function ViewArticle() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -162,7 +163,7 @@ export default function ViewArticle() {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-[#0e1b55]">
       <div className="max-w-6xl mx-auto p-6">
-        {/* Back Button */}
+        {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <Link to={createPageUrl('ArticleLibrary')}>
             <Button variant="ghost" className="dark:text-white dark:hover:bg-[#1a2a6c]">
@@ -170,7 +171,9 @@ export default function ViewArticle() {
               Back to Library
             </Button>
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
+            <UserHeader />
+            <div className="flex items-center gap-2">
             <Button variant="outline" onClick={handleCopy} className="dark:bg-[#1a2a6c] dark:border-[#0e1b55] dark:text-white">
               <Copy className="w-4 h-4 mr-2" />
               Copy
@@ -185,6 +188,7 @@ export default function ViewArticle() {
                 Validate Article
               </Button>
             </Link>
+            </div>
           </div>
         </div>
 

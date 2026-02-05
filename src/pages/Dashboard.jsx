@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
+import UserHeader from '../components/common/UserHeader';
 import AgentAnalytics from '../components/dashboard/AgentAnalytics';
 import AISearchBar from '../components/dashboard/AISearchBar';
 import ArticlesLibrary from '../components/dashboard/ArticlesLibrary';
@@ -57,15 +58,18 @@ export default function Dashboard() {
             <h1 className="text-2xl font-bold text-[#0e1b55] dark:text-white">KCS Dashboard</h1>
             <p className="text-gray-500 dark:text-gray-300 mt-1">Manage your knowledge articles</p>
           </div>
-          <div className="flex items-center gap-3">
-            <DarkModeToggle isDark={isDarkMode} onToggle={toggleDarkMode} />
-            <Button 
-              onClick={() => setShowCreateDialog(true)}
-              className="bg-[#c41230] hover:bg-[#a30f28] text-white"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              New Article
-            </Button>
+          <div className="flex items-center gap-4">
+            <UserHeader />
+            <div className="flex items-center gap-3">
+              <DarkModeToggle isDark={isDarkMode} onToggle={toggleDarkMode} />
+              <Button 
+                onClick={() => setShowCreateDialog(true)}
+                className="bg-[#c41230] hover:bg-[#a30f28] text-white"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                New Article
+              </Button>
+            </div>
           </div>
         </div>
 
