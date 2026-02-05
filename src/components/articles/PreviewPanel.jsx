@@ -64,6 +64,8 @@ export default function PreviewPanel({ formData }) {
     
     toast.info('Generating PDF...');
     
+    const logoUrl = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/698312b3fe9be2c697c692a1/eeb4e4b9a_ChatGPTImageFeb4202612_27_08PM.png';
+    
     const canvas = await html2canvas(contentRef.current, {
       scale: 2,
       useCORS: true,
@@ -74,20 +76,41 @@ export default function PreviewPanel({ formData }) {
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
+    
+    // Add logo header
+    const logoImg = new Image();
+    logoImg.crossOrigin = 'anonymous';
+    
+    await new Promise((resolve) => {
+      logoImg.onload = resolve;
+      logoImg.onerror = resolve;
+      logoImg.src = logoUrl;
+    });
+    
+    const logoHeight = 15;
+    const logoWidth = (logoImg.width / logoImg.height) * logoHeight;
+    const logoX = (pageWidth - logoWidth) / 2;
+    
+    pdf.addImage(logoImg, 'PNG', logoX, 5, logoWidth, logoHeight);
+    
+    // Add content below logo
+    const contentStartY = 25;
     const imgWidth = pageWidth - 20;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
     let heightLeft = imgHeight;
-    let position = 10;
+    let position = contentStartY;
     
     pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+    heightLeft -= (pageHeight - contentStartY);
     
     while (heightLeft > 0) {
-      position = heightLeft - imgHeight + 10;
       pdf.addPage();
+      // Add logo to subsequent pages too
+      pdf.addImage(logoImg, 'PNG', logoX, 5, logoWidth, logoHeight);
+      position = contentStartY - (imgHeight - heightLeft);
       pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
+      heightLeft -= (pageHeight - contentStartY);
     }
     
     pdf.save(`${formData.article_id || 'article'}.pdf`);
