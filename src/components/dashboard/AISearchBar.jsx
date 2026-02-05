@@ -1,18 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Search, Sparkles, Loader2, X } from 'lucide-react';
 
-export default function AISearchBar({ onSearch, onAISuggestions }) {
+// Utility to log search queries for content gap analysis
+const logSearch = async (query, resultsCount) => {
+  try {
+    const user = await base44.auth.me();
+    await base44.entities.SearchLog.create({
+      query: query.trim(),
+      results_count: resultsCount,
+      had_results: resultsCount > 0,
+      user_email: user?.email || 'anonymous'
+    });
+  } catch (error) {
+    console.error('Failed to log search:', error);
+  }
+};
+
+export default function AISearchBar({ onSearch, onAISuggestions, onSearchComplete }) {
   const [query, setQuery] = useState('');
   const [isAISearching, setIsAISearching] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState(null);
 
   const handleRegularSearch = (e) => {
     e.preventDefault();
-    onSearch(query);
+    onSearch(query, (resultsCount) => {
+      // Log search after results are determined
+      if (query.trim()) {
+        logSearch(query, resultsCount);
+      }
+    });
   };
 
   const handleAISearch = async () => {
