@@ -4,10 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Save, RotateCcw, Plus, X, GripVertical } from 'lucide-react';
+import { Save, RotateCcw, Plus, X, GripVertical, ChevronDown, ChevronUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const DEFAULT_ENVIRONMENT_TEMPLATE = `Back-Office: Settings > Personnel
 Table: Personnel
@@ -41,6 +42,7 @@ export default function TemplateConfigTab({ settings, onSave }) {
   const [newModuleCode, setNewModuleCode] = useState('');
   const [newModuleLabel, setNewModuleLabel] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [modulesExpanded, setModulesExpanded] = useState(false);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -116,46 +118,57 @@ export default function TemplateConfigTab({ settings, onSave }) {
           </div>
 
           <div className="space-y-3">
-            <Label>Module Identifiers</Label>
-            <p className="text-sm text-gray-500">Drag to reorder. The order here determines the dropdown order.</p>
-            <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable droppableId="modules" direction="vertical">
-                {(provided) => (
-                  <div 
-                    {...provided.droppableProps} 
-                    ref={provided.innerRef}
-                    className="space-y-2"
-                  >
-                    {moduleOptions.map((mod, index) => (
-                      <Draggable key={mod.value} draggableId={mod.value} index={index}>
-                        {(provided, snapshot) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            className={`flex items-center gap-2 p-2 rounded-lg border ${
-                              snapshot.isDragging ? 'bg-blue-50 border-blue-300 shadow-lg' : 'bg-white border-gray-200'
-                            }`}
-                          >
-                            <div {...provided.dragHandleProps} className="cursor-grab text-gray-400 hover:text-gray-600">
-                              <GripVertical className="w-4 h-4" />
-                            </div>
-                            <span className="font-mono font-semibold text-sm">{mod.value}</span>
-                            <span className="text-gray-500 text-sm">- {mod.label}</span>
-                            <button 
-                              onClick={() => removeModuleOption(index)}
-                              className="ml-auto text-gray-400 hover:text-red-500"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
+            <Collapsible open={modulesExpanded} onOpenChange={setModulesExpanded}>
+              <div className="flex items-center justify-between">
+                <Label>Module Identifiers ({moduleOptions.length})</Label>
+                <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                    {modulesExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </Button>
+                </CollapsibleTrigger>
+              </div>
+              <CollapsibleContent className="space-y-2 mt-2">
+                <p className="text-sm text-gray-500">Drag to reorder. The order here determines the dropdown order.</p>
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Droppable droppableId="modules" direction="vertical">
+                    {(provided) => (
+                      <div 
+                        {...provided.droppableProps} 
+                        ref={provided.innerRef}
+                        className="space-y-2 max-h-[300px] overflow-y-auto"
+                      >
+                        {moduleOptions.map((mod, index) => (
+                          <Draggable key={mod.value} draggableId={mod.value} index={index}>
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                className={`flex items-center gap-2 p-2 rounded-lg border ${
+                                  snapshot.isDragging ? 'bg-blue-50 border-blue-300 shadow-lg' : 'bg-white border-gray-200'
+                                }`}
+                              >
+                                <div {...provided.dragHandleProps} className="cursor-grab text-gray-400 hover:text-gray-600">
+                                  <GripVertical className="w-4 h-4" />
+                                </div>
+                                <span className="font-mono font-semibold text-sm">{mod.value}</span>
+                                <span className="text-gray-500 text-sm">- {mod.label}</span>
+                                <button 
+                                  onClick={() => removeModuleOption(index)}
+                                  className="ml-auto text-gray-400 hover:text-red-500"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              </CollapsibleContent>
+            </Collapsible>
             <div className="flex gap-2 items-center">
               <Input
                 value={newModuleCode}

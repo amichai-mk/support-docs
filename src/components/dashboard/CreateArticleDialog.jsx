@@ -13,8 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Sparkles, FileText, Loader2 } from 'lucide-react';
+import { Sparkles, FileText, Loader2, Database } from 'lucide-react';
 import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
 
 const DEFAULT_MODULE_OPTIONS = [
   { value: 'PER', label: 'Personnel' },
@@ -28,7 +29,7 @@ const DEFAULT_MODULE_OPTIONS = [
   { value: 'GEN', label: 'General' },
 ];
 
-const DEFAULT_ID_FORMAT = 'KCS-{MODULE}-{NUMBER}-DB';
+const DEFAULT_ID_FORMAT = 'KCS-{MODULE}-{NUMBER}-{DB}';
 
 export default function CreateArticleDialog({ open, onOpenChange }) {
   const navigate = useNavigate();
@@ -40,6 +41,7 @@ export default function CreateArticleDialog({ open, onOpenChange }) {
   const [aiPrompt, setAiPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [moduleUsageCounts, setModuleUsageCounts] = useState({});
+  const [dbAcronym, setDbAcronym] = useState('DB');
 
   useEffect(() => {
     if (open) {
@@ -74,7 +76,7 @@ export default function CreateArticleDialog({ open, onOpenChange }) {
   // Modules are already sorted by admin in settings, just return as-is
   const getSortedModules = () => moduleOptions;
 
-  const generateArticleId = async (module) => {
+  const generateArticleId = async (module, dbAcronym = 'DB') => {
     const allArticles = await base44.entities.Article.list();
     const nextNumber = allArticles.length + 1;
     const now = new Date();
@@ -83,19 +85,21 @@ export default function CreateArticleDialog({ open, onOpenChange }) {
       .replace('{MODULE}', module)
       .replace('{NUMBER}', String(nextNumber).padStart(4, '0'))
       .replace('{YEAR}', String(now.getFullYear()))
-      .replace('{MONTH}', String(now.getMonth() + 1).padStart(2, '0'));
+      .replace('{MONTH}', String(now.getMonth() + 1).padStart(2, '0'))
+      .replace('{DB}', dbAcronym);
   };
 
   const handleCreateArticle = async () => {
     if (!selectedModule) return;
     
     setIsCreating(true);
-    const generatedId = await generateArticleId(selectedModule);
+    const generatedId = await generateArticleId(selectedModule, dbAcronym || 'DB');
     
     const article = await base44.entities.Article.create({
       article_id: generatedId,
       title: 'Untitled Article',
       issue: '',
+      environment: `Database: ${dbAcronym || 'DB'}`,
       status: 'draft',
       product_area: moduleOptions.find(m => m.value === selectedModule)?.label || '',
       resolutions: [{ title: '', steps: [], verification: '' }],
@@ -115,7 +119,7 @@ export default function CreateArticleDialog({ open, onOpenChange }) {
     setIsGenerating(true);
     
     try {
-      const generatedId = await generateArticleId(selectedModule);
+      const generatedId = await generateArticleId(selectedModule, dbAcronym || 'DB');
       const productArea = moduleOptions.find(m => m.value === selectedModule)?.label || '';
       
       const aiResponse = await base44.integrations.Core.InvokeLLM({
@@ -186,6 +190,7 @@ Product Area: ${productArea}`,
     setSelectedModule('');
     setAiPrompt('');
     setActiveTab('manual');
+    setDbAcronym('DB');
   };
 
   return (
@@ -233,6 +238,21 @@ Product Area: ${productArea}`,
                 </SelectContent>
               </Select>
             </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Database className="w-4 h-4" />
+                Database Acronym
+              </label>
+              <Input
+                value={dbAcronym}
+                onChange={(e) => setDbAcronym(e.target.value.toUpperCase().slice(0, 6))}
+                placeholder="e.g., CLMA"
+                className="font-mono"
+                maxLength={6}
+              />
+              <p className="text-xs text-gray-500">This will be used in the article ID suffix</p>
+            </div>
             
             {selectedModule && (
               <div className="p-3 bg-gray-100 rounded-lg">
@@ -242,7 +262,8 @@ Product Area: ${productArea}`,
                     .replace('{MODULE}', selectedModule)
                     .replace('{NUMBER}', 'XXXX')
                     .replace('{YEAR}', String(new Date().getFullYear()))
-                    .replace('{MONTH}', String(new Date().getMonth() + 1).padStart(2, '0'))}
+                    .replace('{MONTH}', String(new Date().getMonth() + 1).padStart(2, '0'))
+                    .replace('{DB}', dbAcronym || 'DB')}
                 </p>
               </div>
             )}
@@ -295,6 +316,20 @@ Product Area: ${productArea}`,
               </p>
             </div>
 
+            <div className="space-y-2">
+              <label className="text-sm font-medium flex items-center gap-2">
+                <Database className="w-4 h-4" />
+                Database Acronym
+              </label>
+              <Input
+                value={dbAcronym}
+                onChange={(e) => setDbAcronym(e.target.value.toUpperCase().slice(0, 6))}
+                placeholder="e.g., CLMA"
+                className="font-mono"
+                maxLength={6}
+              />
+            </div>
+
             {selectedModule && (
               <div className="p-3 bg-gray-100 rounded-lg">
                 <p className="text-sm text-gray-600">Article ID will be:</p>
@@ -303,7 +338,8 @@ Product Area: ${productArea}`,
                     .replace('{MODULE}', selectedModule)
                     .replace('{NUMBER}', 'XXXX')
                     .replace('{YEAR}', String(new Date().getFullYear()))
-                    .replace('{MONTH}', String(new Date().getMonth() + 1).padStart(2, '0'))}
+                    .replace('{MONTH}', String(new Date().getMonth() + 1).padStart(2, '0'))
+                    .replace('{DB}', dbAcronym || 'DB')}
                 </p>
               </div>
             )}
