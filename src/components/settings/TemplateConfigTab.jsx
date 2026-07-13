@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Save, RotateCcw, Plus, X, GripVertical, ChevronDown, ChevronUp } from 'lucide-react';
+import { Save, RotateCcw, Plus, X, GripVertical, ChevronDown, ChevronUp, Download } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
@@ -81,6 +81,67 @@ export default function TemplateConfigTab({ settings, onSave }) {
     items.splice(result.destination.index, 0, reorderedItem);
     
     setModuleOptions(items);
+  };
+
+  const handleDownloadTemplate = () => {
+    const lines = [
+      `# Article Title: [Enter title]`,
+      '',
+      `## Article ID`,
+      `[${articleIdFormat.replace('{MODULE}', 'PER').replace('{NUMBER}', '0001')}]`,
+      '',
+      '## Database',
+      '[Enter database acronym, e.g., CLMA]',
+      '',
+      '## Product Area',
+      '[Enter product area, e.g., Personnel, Incidents, Reporting]',
+      '',
+      '## Issue (Problem Statement)',
+      '[Max 150 characters - describe the problem concisely]',
+      '',
+      '## Environment',
+      '[Conditions and context - use bold key-value format]',
+      '',
+      ...environmentTemplate.split('\n').map(l => l.trim()),
+      '',
+      '## Cause (Root Cause)',
+      '[Max 300 characters - explain the root cause]',
+      '',
+      '## Resolution',
+      '',
+      '### Option A: [Resolution title]',
+      '1. [Step 1]',
+      '2. [Step 2]',
+      '3. [Step 3]',
+      '',
+      '**Verification:** [How to verify the resolution worked - max 200 chars]',
+      '',
+      '### Option B: [Optional second resolution]',
+      '1. [Step 1]',
+      '2. [Step 2]',
+      '',
+      '**Verification:** [Verification statement]',
+      '',
+      '## Visual Assets',
+      '- [Screenshot/image URL and caption]',
+      '- [Video URL and caption]',
+      '',
+      '## Tags',
+      '[tag1, tag2, tag3]',
+      '',
+      '---',
+      '## Status',
+      '[draft / review / published / archived]',
+    ];
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'KCS_Article_Template.md';
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success('Blank template downloaded');
   };
 
   // Generate preview of the ID format
@@ -216,6 +277,10 @@ export default function TemplateConfigTab({ settings, onSave }) {
         <Button variant="outline" onClick={handleReset}>
           <RotateCcw className="w-4 h-4 mr-2" />
           Reset to Defaults
+        </Button>
+        <Button variant="outline" onClick={handleDownloadTemplate}>
+          <Download className="w-4 h-4 mr-2" />
+          Download Blank Template
         </Button>
       </div>
     </div>

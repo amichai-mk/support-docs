@@ -1,0 +1,25 @@
+{
+  "name": "SearchLog",
+  "type": "object",
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "The search term entered by the user"
+    },
+    "results_count": {
+      "type": "number",
+      "description": "Number of articles found for this search"
+    },
+    "had_results": {
+      "type": "boolean",
+      "description": "Whether the search returned any results"
+    },
+    "user_email": {
+      "type": "string",
+      "description": "Email of the user who performed the search"
+    }
+  },
+  "required": [
+    "query"
+  ]
+}

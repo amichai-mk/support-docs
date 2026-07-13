@@ -1,0 +1,43 @@
+{
+  "name": "ArticleHistory",
+  "type": "object",
+  "properties": {
+    "article_id": {
+      "type": "string",
+      "description": "Reference to the article ID"
+    },
+    "action_type": {
+      "type": "string",
+      "enum": [
+        "published",
+        "validated",
+        "updated"
+      ],
+      "description": "Type of action performed"
+    },
+    "validator_email": {
+      "type": "string",
+      "description": "Email of the user who validated"
+    },
+    "validator_name": {
+      "type": "string",
+      "description": "Name of the user who validated"
+    },
+    "quality_rating": {
+      "type": "number",
+      "description": "Quality rating 1-5 stars"
+    },
+    "changes_summary": {
+      "type": "string",
+      "description": "Summary of changes made during validation"
+    },
+    "previous_snapshot": {
+      "type": "object",
+      "description": "Snapshot of article before changes"
+    }
+  },
+  "required": [
+    "article_id",
+    "action_type"
+  ]
+}

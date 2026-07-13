@@ -1,0 +1,131 @@
+{
+  "name": "Article",
+  "type": "object",
+  "properties": {
+    "article_id": {
+      "type": "string",
+      "description": "Unique article identifier (e.g., KCS-PER-0001-CLMA)"
+    },
+    "title": {
+      "type": "string",
+      "description": "Article title"
+    },
+    "issue": {
+      "type": "string",
+      "description": "Issue section - problem statement (max 150 chars)"
+    },
+    "database": {
+      "type": "string",
+      "description": "Database acronym (e.g., CLMA, ECSO)"
+    },
+    "environment": {
+      "type": "string",
+      "description": "Environment section - conditions & context with bold key-value format"
+    },
+    "cause": {
+      "type": "string",
+      "description": "Cause section - root cause explanation (max 300 chars)"
+    },
+    "resolutions": {
+      "type": "array",
+      "description": "Array of resolution options (for issues with multiple solutions)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Resolution title (e.g., 'Option A: Quick Fix')"
+          },
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string"
+                },
+                "image": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "verification": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "resolution_steps": {
+      "type": "array",
+      "description": "Legacy: Array of resolution steps (deprecated, use resolutions)",
+      "items": {
+        "type": "string"
+      }
+    },
+    "verification": {
+      "type": "string",
+      "description": "Legacy: Verification statement for resolution (deprecated, use resolutions)"
+    },
+    "visual_assets": {
+      "type": "array",
+      "description": "Visual aids (screenshots, videos, workflows)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "image",
+              "video",
+              "youtube",
+              "iframe"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "review",
+        "published",
+        "archived"
+      ],
+      "default": "draft",
+      "description": "Article status"
+    },
+    "product_area": {
+      "type": "string",
+      "description": "Product area (e.g., Personnel, Incidents, Reporting)"
+    },
+    "tags": {
+      "type": "array",
+      "description": "Article tags for categorization",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confluence_page_id": {
+      "type": "string",
+      "description": "Confluence page ID after publishing"
+    },
+    "completeness_score": {
+      "type": "number",
+      "description": "Completeness score percentage"
+    },
+    "last_auto_save": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last auto-save timestamp"
+    }
+  },
+  "required": []
+}
