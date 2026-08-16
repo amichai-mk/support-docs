@@ -27,7 +27,7 @@ export default function Layout({ children }) {
           <div className="w-10" />
           <Link to={createPageUrl('Dashboard')}>
             <span className="text-xl font-bold text-gray-900 dark:text-white cursor-pointer">
-              KCS Knowledge Base
+              Support Docs
             </span>
           </Link>
           <div className="flex items-center gap-2">

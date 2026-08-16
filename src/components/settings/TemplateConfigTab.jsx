@@ -138,7 +138,7 @@ export default function TemplateConfigTab({ settings, onSave }) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'KCS_Article_Template.md';
+    a.download = 'Support_Docs_Article_Template.md';
     a.click();
     URL.revokeObjectURL(url);
     toast.success('Blank template downloaded');

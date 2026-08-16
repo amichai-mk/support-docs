@@ -90,7 +90,7 @@ Deno.serve(async (req) => {
       let html = `<!DOCTYPE html>
 <html>
 <head>
-  <title>KCS Articles Export</title>
+  <title>Support Docs Articles Export</title>
   <style>
     body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
     .article { border: 1px solid #ddd; padding: 20px; margin-bottom: 30px; page-break-after: always; }
@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
       return new Response(html, {
         headers: {
           'Content-Type': 'text/html',
-          'Content-Disposition': 'attachment; filename=kcs-articles-export.html'
+          'Content-Disposition': 'attachment; filename=support-docs-articles-export.html'
         }
       });
     }

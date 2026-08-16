@@ -96,7 +96,7 @@ export default function PreviewPanel({ formData }) {
       // Add text header on each page
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('KCS Knowledge Base', pageWidth / 2, 12, { align: 'center' });
+      pdf.text('Support Docs', pageWidth / 2, 12, { align: 'center' });
       
       // Calculate the portion of the canvas to render on this page
       const sourceY = page * (usableHeight / imgHeight) * canvas.height;

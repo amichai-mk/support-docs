@@ -55,7 +55,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-[#0e1b55] dark:text-white">KCS Dashboard</h1>
+            <h1 className="text-2xl font-bold text-[#0e1b55] dark:text-white">Support Docs</h1>
             <p className="text-gray-500 dark:text-gray-300 mt-1">Manage your knowledge articles</p>
           </div>
           <div className="flex items-center gap-4">
