@@ -50,8 +50,7 @@ export default function ExportSyncTab() {
 
     setSyncingTo(platform);
     try {
-      const functionName = platform === 'hubspot' ? 'syncToHubspot' : 'syncToZoho';
-      const response = await base44.functions.invoke(functionName, {
+      const response = await base44.functions.invoke('syncToHubspot', {
         articleIds: selectedArticles,
       });
 

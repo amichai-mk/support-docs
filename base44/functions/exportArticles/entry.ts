@@ -95,8 +95,8 @@ Deno.serve(async (req) => {
     body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
     .article { border: 1px solid #ddd; padding: 20px; margin-bottom: 30px; page-break-after: always; }
     .article-id { color: #666; font-size: 12px; }
-    h1 { color: #0e1b55; }
-    h2 { color: #333; border-bottom: 2px solid #c41230; padding-bottom: 5px; }
+    h1 { color: #1e3a8a; }
+    h2 { color: #333; border-bottom: 2px solid #6b7280; padding-bottom: 5px; }
     pre { background: #f5f5f5; padding: 10px; overflow-x: auto; }
     ol { padding-left: 20px; }
     li { margin-bottom: 8px; }

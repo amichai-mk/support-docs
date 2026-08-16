@@ -64,25 +64,9 @@ export default function PreviewPanel({ formData }) {
     
     toast.info('Generating PDF...');
     
-    const logoUrl = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/698312b3fe9be2c697c692a1/eeb4e4b9a_ChatGPTImageFeb4202612_27_08PM.png';
-    
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    
-    // Load logo
-    const logoImg = new Image();
-    logoImg.crossOrigin = 'anonymous';
-    
-    await new Promise((resolve) => {
-      logoImg.onload = resolve;
-      logoImg.onerror = resolve;
-      logoImg.src = logoUrl;
-    });
-    
-    const logoHeight = 15;
-    const logoWidth = (logoImg.width / logoImg.height) * logoHeight;
-    const logoX = (pageWidth - logoWidth) / 2;
     
     // Content area settings
     const contentStartY = 25;
@@ -109,8 +93,10 @@ export default function PreviewPanel({ formData }) {
         pdf.addPage();
       }
       
-      // Add logo header on each page
-      pdf.addImage(logoImg, 'PNG', logoX, 5, logoWidth, logoHeight);
+      // Add text header on each page
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('KCS Knowledge Base', pageWidth / 2, 12, { align: 'center' });
       
       // Calculate the portion of the canvas to render on this page
       const sourceY = page * (usableHeight / imgHeight) * canvas.height;
